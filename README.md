@@ -16,9 +16,9 @@ This project is built from scratch, but not without prior knowledge. I am basing
 
 Status|Work|Notes
 -|-|-
-🏃|Set up basic infrastructure.|
-🏃|Radar (track unfreed allocations)|
-❌|Reporter (handle output of information)|
+🏃|Set up basic infrastructure.|Remove WD_STD_PARAMS for functions that do not need them. Ensure header inclusions make sense.
+🏃|Radar (track unfreed allocations)|Ensure realloc works.
+🏃|Reporter (handle output of information)|Functionality of alerts still unclear.
 ❌|Checkpoints (track control flow)|
 ❌|Padding (catch buffer overflows)|
 ❌|Snapshots (catch accidental memory modification)|
