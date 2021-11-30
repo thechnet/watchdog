@@ -1,0 +1,13 @@
+src/checkpoints.c
+src/dangling.c
+src/padding.c
+src/radar.c
+src/snapshots.c
+src/usage.c
+src/watchdog.c
+src/reporter.c
+src/overrides.c
+
+test.c
+
+-o build/test.exe

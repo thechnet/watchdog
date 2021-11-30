@@ -1,0 +1,13 @@
+.DS_Store
+desktop.ini
+.vscode*
+
+build
+private
+
+__pycache__
+*.dSYM
+*.exe
+*.exe.stackdump
+*.ilk
+*.pdb

@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": "Watchdog"
+		},
+		{
+			"path": "..\\watchdog-0",
+			"name": "(Previous Attempt)"
+		},
+		{
+			"path": "..\\Une\\src\\util",
+			"name": "(Memdbg)"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"radar.h": "c",
+			"private.h": "c",
+			"stdbool.h": "c"
+		}
+	}
+}
