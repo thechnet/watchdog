@@ -1,12 +1,12 @@
-src/checkpoints.c
-src/dangling.c
-src/padding.c
 src/radar.c
-src/snapshots.c
-src/usage.c
-src/watchdog.c
 src/reporter.c
+src/tracks.c
+src/padding.c
+src/snapshots.c
+src/dangling.c
+src/usage.c
 src/overrides.c
+src/public.c
 
 test.c
 

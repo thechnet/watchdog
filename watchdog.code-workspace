@@ -16,7 +16,7 @@
 	"settings": {
 		"files.associations": {
 			"radar.h": "c",
-			"private.h": "c",
+			"dogshed.h": "c",
 			"stdbool.h": "c"
 		}
 	}

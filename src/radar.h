@@ -1,13 +1,13 @@
 /*
 radar.h - watchdog
-Modified 2021-11-30
+Modified 2021-12-01
 */
 
 #ifndef WD_RADAR_H
 #define WD_RADAR_H
 
 /* Header-specific includes. */
-#include "private.h"
+#include "dogshed.h"
 
 /*
 *** Radar constants.
@@ -26,11 +26,11 @@ extern size_t wd_radar_size;
 *** Radar interface.
 */
 
-void wd_radar_open(void);
-void wd_radar_close(void);
-wd_alloc *wd_radar_locate(WD_STD_PARAMS, char *memory);
+void wd_radar_enable(void);
+void wd_radar_disable(void);
+wd_alloc *wd_radar_find(WD_STD_PARAMS, char *memory);
 void wd_radar_grow(WD_STD_PARAMS);
-wd_alloc *wd_radar_track(WD_STD_PARAMS, char *memory, size_t memory_size);
+wd_alloc *wd_radar_watch(WD_STD_PARAMS, char *memory, size_t memory_size);
 bool wd_radar_drop(WD_STD_PARAMS, char *memory);
 
 #endif

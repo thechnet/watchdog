@@ -1,10 +1,10 @@
 /*
 reporter.h - watchdog
-Modified 2021-11-30
+Modified 2021-12-01
 */
 
 /* Header-specific includes. */
-#include "private.h"
+#include "dogshed.h"
 
 /*
 *** Reporter globals.

@@ -1,6 +1,6 @@
 /*
 overrides.c - watchdog
-Modified 2021-11-30
+Modified 2021-12-01
 */
 
 /* Header-specific includes. */
@@ -34,7 +34,7 @@ void *wd_override_malloc(WD_STD_PARAMS, size_t size)
     fail_at(WD_STD_PARAMS_PASS, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", size);
   }
   
-  wd_radar_track(WD_STD_PARAMS_PASS, memory, size);
+  wd_radar_watch(WD_STD_PARAMS_PASS, memory, size);
   return memory;
 }
 

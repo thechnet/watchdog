@@ -19,7 +19,7 @@ Status|Work|Notes
 🏃|Set up basic infrastructure.|Remove WD_STD_PARAMS for functions that do not need them. Ensure header inclusions make sense.
 🏃|Radar (track unfreed allocations)|Ensure realloc works.
 🏃|Reporter (handle output of information)|Functionality of alerts still unclear.
-❌|Checkpoints (track control flow)|
+❌|Tracks (track control flow)|
 ❌|Padding (catch buffer overflows)|
 ❌|Snapshots (catch accidental memory modification)|
 ❌|Dangling (track dangling pointers)|
@@ -27,17 +27,9 @@ Status|Work|Notes
 
 ## Source Overview
 
-### `checkpoints`
+### `dogshed.h`
 
-Keeps track of the most recent position at which the program was executing successfully.
-
-### `dangling`
-
-Keeps track of addresses that were previously freed, to warn the user if they are referencing a dangling pointer. Also sets freed pointers to `NULL` after deallocation to cause an immediate crash on use of a dangling pointer.
-
-### `padding`
-
-Handles allocation padding.
+Contains general declarations used throughout the private aspect of the codebase.
 
 ### `radar`
 
@@ -47,23 +39,30 @@ Keeps track of unfreed allocations to warn the developer if they are not freeing
 
 Continously prints status updates to an external file.
 
+### `tracks`
+
+Keeps track of the most recent position at which the program was executing successfully.
+
+### `padding`
+
+Handles allocation padding.
+
 ### `snapshots`
 
 Keeps copies of memory between operations to catch accidental modifications.
+
+### `dangling`
+
+Keeps track of addresses that were previously freed, to warn the user if they are referencing a dangling pointer. Also sets freed pointers to `NULL` after deallocation to cause an immediate crash on use of a dangling pointer.
 
 ### `usage`
 
 Keeps a copy of the initial data at a memory location to calculate the actual memory usage compared to the allocated amount.
 
-### `private.h`
+### `overrides`
 
-Contains private global declarations.
+Contains function overrides.
 
-### `public.h`
+### `public.c`
 
-Contains public global declarations.
-
-### `watchdog.c`
-
-Defines general functions such as the initializer.
-
+Defines general public functions such as the initializer.

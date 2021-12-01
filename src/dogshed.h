@@ -1,6 +1,6 @@
 /*
-private.h - watchdog
-Modified 2021-11-30
+dogshed.h - watchdog
+Modified 2021-12-01
 */
 
 #ifndef WD_PRIVATE_H

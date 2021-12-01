@@ -1,6 +1,6 @@
 /*
 radar.c - watchdog
-Modified 2021-11-30
+Modified 2021-12-01
 */
 
 /* Header-specific includes. */
@@ -30,7 +30,7 @@ size_t wd_radar_size = 0;
 /*
 Start the radar.
 */
-void wd_radar_open(void)
+void wd_radar_enable(void)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(!wd_unleashed);
@@ -48,7 +48,7 @@ void wd_radar_open(void)
 /*
 Stop the radar.
 */
-void wd_radar_close(void)
+void wd_radar_disable(void)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -63,7 +63,7 @@ void wd_radar_close(void)
 /*
 Locate an address on the radar.
 */
-wd_alloc *wd_radar_locate(WD_STD_PARAMS, char *memory)
+wd_alloc *wd_radar_find(WD_STD_PARAMS, char *memory)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -102,14 +102,14 @@ void wd_radar_grow(WD_STD_PARAMS)
 /*
 Start tracking an address on the radar.
 */
-wd_alloc *wd_radar_track(WD_STD_PARAMS, char *memory, size_t memory_size)
+wd_alloc *wd_radar_watch(WD_STD_PARAMS, char *memory, size_t memory_size)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
   assert(wd_radar != NULL);
   
   out("radar:track %p", memory);
-  wd_alloc *alloc = wd_radar_locate(WD_STD_PARAMS_PASS, WD_RADAR_EMPTY_SPOT);
+  wd_alloc *alloc = wd_radar_find(WD_STD_PARAMS_PASS, WD_RADAR_EMPTY_SPOT);
   assert(alloc != NULL);
   *alloc = (wd_alloc){
     .memory = memory,
@@ -129,7 +129,7 @@ bool wd_radar_drop(WD_STD_PARAMS, char *memory)
   assert(wd_radar != NULL);
   
   out("radar:drop %p", memory);
-  wd_alloc *alloc = wd_radar_locate(WD_STD_PARAMS_PASS, memory);
+  wd_alloc *alloc = wd_radar_find(WD_STD_PARAMS_PASS, memory);
   if (alloc == NULL)
     return false;
   *alloc = (wd_alloc){
