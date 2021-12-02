@@ -8,6 +8,7 @@ Modified 2021-11-30
 
 /* Implementation-specific includes. */
 #include "radar.h"
+#include "tracks.h"
 
 /*
 *** Reporter globals.
@@ -38,4 +39,7 @@ void wd_reporter_summary(void)
     }
   if (radar_empty)
     success(WD_MSG_ALL_FREED);
+  
+  /* Show last tracks. */
+  info_at(wd_track.file, wd_track.line, WD_MSG_TRACK);
 }

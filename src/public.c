@@ -10,6 +10,7 @@ Modified 2021-12-01
 #include "dogshed.h"
 #include "radar.h"
 #include "reporter.h"
+#include "tracks.h"
 
 /*
 *** Globals.
@@ -53,4 +54,13 @@ void wd_unleash(WD_STD_PARAMS)
     warn(WD_MSG_ATEXIT);
   }
   wd_unleashed = true;
+}
+
+/*
+Check state.
+*/
+int wd_bark(WD_STD_PARAMS)
+{
+  wd_tracks_update(WD_STD_PARAMS_PASS);
+  return 1;
 }
