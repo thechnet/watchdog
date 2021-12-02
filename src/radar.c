@@ -1,6 +1,6 @@
 /*
 radar.c - watchdog
-Modified 2021-12-01
+Modified 2021-12-02
 */
 
 /* Header-specific includes. */
@@ -73,9 +73,15 @@ wd_alloc *wd_radar_find(WD_STD_PARAMS, char *memory)
   for (alloc=wd_radar; alloc<wd_radar+wd_radar_size; alloc++)
     if (alloc->memory == memory)
       break;
-  if (alloc >= wd_radar+wd_radar_size) {
-    wd_radar_grow(WD_STD_PARAMS_PASS);
-    alloc = wd_radar+wd_radar_size;
+  
+  assert (alloc <= wd_radar+wd_radar_size);
+  if (alloc == wd_radar+wd_radar_size) {
+    if (memory == WD_RADAR_EMPTY_SPOT) {
+      wd_radar_grow(WD_STD_PARAMS_PASS);
+      alloc = wd_radar+wd_radar_size/2;
+    } else {
+      return NULL;
+    }
   }
   return alloc;
 }

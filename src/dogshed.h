@@ -1,6 +1,6 @@
 /*
 dogshed.h - watchdog
-Modified 2021-12-01
+Modified 2021-12-02
 */
 
 #ifndef WD_PRIVATE_H
@@ -18,11 +18,13 @@ Modified 2021-12-01
 */
 
 #define WD_MSG_OUT_OF_MEMORY "Out of memory."
-#define WD_MSG_FREE_UNTRACKED_MEMORY "Freeing untracked memory."
+#define WD_MSG_UNTRACKED_MEMORY "Untracked memory."
 #define WD_MSG_NOT_FREED "Memory not freed."
 #define WD_MSG_ALL_FREED "All memory freed."
 #define WD_MSG_ATEXIT "atexit failed. Call wd_restrain manually."
 #define WD_MSG_SIZE_0 "Size is 0."
+#define WD_MSG_INCOMING_NULL "Incoming NULL pointer."
+#define WD_MSG_REALLOC_SIZE "Size smaller or same."
 
 #define WD_STD_PARAMS char *file, size_t line
 #define WD_STD_PARAMS_PASS file, line

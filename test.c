@@ -7,9 +7,8 @@
 int main(void)
 {
   int *a = malloc(1);
-  int *b = malloc(1);
+  a = realloc(a, 0);
   free(a);
-  free(b);
   
   wprintf(L"Done.\n");
 }
