@@ -36,7 +36,6 @@ void wd_radar_enable(void)
   assert(!wd_unleashed);
   assert(wd_radar == NULL);
   
-  out("radar:start");
   wd_radar_size = WD_RADAR_SIZE;
   wd_radar = malloc(wd_radar_size*sizeof(*wd_radar));
   if (wd_radar == NULL) {
@@ -57,7 +56,6 @@ void wd_radar_disable(void)
   free(wd_radar);
   wd_radar = NULL;
   wd_radar_size = 0;
-  out("radar:stop");
 }
 
 /*
@@ -96,7 +94,6 @@ void wd_radar_grow(WD_STD_PARAMS)
   assert(wd_radar != NULL);
   assert(wd_radar_size > 0);
   
-  out("radar:grow");
   wd_radar_size *= 2;
   wd_radar = realloc(wd_radar, wd_radar_size*sizeof(*wd_radar));
   if (wd_radar == NULL) {
@@ -108,19 +105,20 @@ void wd_radar_grow(WD_STD_PARAMS)
 /*
 Start tracking an address on the radar.
 */
-wd_alloc *wd_radar_watch(WD_STD_PARAMS, char *memory, size_t memory_size)
+wd_alloc *wd_radar_watch(WD_STD_PARAMS, char *memory, size_t size, bool check_padding)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
   assert(wd_radar != NULL);
   
-  out("radar:track %p", memory);
   wd_alloc *alloc = wd_radar_find(WD_STD_PARAMS_PASS, WD_RADAR_EMPTY_SPOT);
   assert(alloc != NULL);
   *alloc = (wd_alloc){
     .memory = memory,
-    .memory_size = memory_size,
-    .origin = (wd_point){ WD_STD_PARAMS_PASS }
+    .size = size,
+    .origin = (wd_point){ WD_STD_PARAMS_PASS },
+    .check_padding = check_padding,
+    .snapshot = NULL
   };
   return alloc;
 }
@@ -134,14 +132,19 @@ bool wd_radar_drop(WD_STD_PARAMS, char *memory)
   assert(wd_unleashed);
   assert(wd_radar != NULL);
   
-  out("radar:drop %p", memory);
   wd_alloc *alloc = wd_radar_find(WD_STD_PARAMS_PASS, memory);
   if (alloc == NULL)
     return false;
+  
+  // FIXME: Snapshots are allocated and reallocated at the function overrides.
+  if (alloc->snapshot != NULL)
+    free(alloc->snapshot);
+  
   *alloc = (wd_alloc){
     .memory = NULL,
-    .memory_size = 0,
-    .origin = (wd_point){ NULL, 0 }
+    .size = 0,
+    .origin = (wd_point){ NULL, 0 },
+    .snapshot = NULL
   };
   return true;
 }

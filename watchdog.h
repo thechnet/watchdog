@@ -1,6 +1,12 @@
-#ifndef WATCHDOG
-#define WATCHDOG
+/*
+watchdog.h - watchdog
+Modified 2021-12-02
+*/
 
+#if defined(WATCHDOG) && !defined(WATCHDOG_H)
+#define WATCHDOG_H
+
+#include "src/public.h"
 #include "src/overrides.h"
 
 /*
@@ -23,4 +29,4 @@ Keywords.
 #define switch(__expr...) switch ((__expr)*wd_bark(WD_STD_ARGS))
 #define sizeof(__type) (sizeof(__type)*wd_bark(WD_STD_ARGS))
 
-#endif /* !WATCHDOG */
+#endif /* !WATCHDOG_H */

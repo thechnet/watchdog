@@ -9,6 +9,9 @@ Modified 2021-12-02
 /* Implementation-specific includes. */
 #include "radar.h"
 #include "reporter.h"
+#include "public.h"
+#include "padding.h"
+#include <memory.h>
 
 /*
 *** Overrides.
@@ -21,12 +24,20 @@ void *wd_override_malloc(WD_STD_PARAMS, size_t size)
 {
   /* Assert that this function runs in the right circumstances. */
   WD_ENSURE_UNLEASHED();
+  assert(wd_padding_generated);
+  
+  /* Check state. */
+  wd_bark(WD_STD_PARAMS_PASS);
   
   /* Verify incoming values. */
   if (size == 0)
     warn_at(file, line, WD_MSG_SIZE_0); // FIXME: Find solution to WD_STD_PARAMS_PASS.
   
-  void *memory = malloc(size);
+  /* Allocate memory. */
+  void *memory = malloc(size+WD_PADDING_SIZE);
+  
+  /* Add padding. */
+  memcpy(memory+size, wd_padding, WD_PADDING_SIZE);
   
   /* Verify outgoing values. */
   if (memory == NULL) {
@@ -34,7 +45,16 @@ void *wd_override_malloc(WD_STD_PARAMS, size_t size)
     fail_at(WD_STD_PARAMS_PASS, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", size);
   }
   
-  wd_radar_watch(WD_STD_PARAMS_PASS, memory, size);
+  /* Add to radar. */
+  wd_alloc *alloc = wd_radar_watch(WD_STD_PARAMS_PASS, memory, size, true);
+  
+  /* Allocate snapshot memory. */
+  alloc->snapshot = malloc(size);
+  if (alloc->snapshot == NULL) {
+    wd_alerts++;
+    fail_at(WD_STD_ARGS, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", size);
+  }
+  
   return memory;
 }
 
@@ -45,6 +65,10 @@ void *wd_override_realloc(WD_STD_PARAMS, void *memory, size_t new_size)
 {
   /* Assert that this function runs in the right circumstances. */
   WD_ENSURE_UNLEASHED();
+  assert(wd_padding_generated);
+  
+  /* Check state. */
+  wd_bark(WD_STD_PARAMS_PASS);
   
   /* Verify incoming values. */
   if (memory == NULL) {
@@ -60,20 +84,34 @@ void *wd_override_realloc(WD_STD_PARAMS, void *memory, size_t new_size)
     wd_alerts++;
     fail_at(file, line, WD_MSG_UNTRACKED_MEMORY);
   }
-  if (new_size <= alloc->memory_size) {
+  if (new_size <= alloc->size) {
     wd_alerts++;
     warn_at(file, line, WD_MSG_REALLOC_SIZE);
   }
   
+  /* Temporarily remove padding. */
+  memset(alloc->memory+alloc->size, WD_PADDING_CLEAR_CHAR, WD_PADDING_SIZE);
+  
   /* Reallocate memory. */
-  alloc->memory_size *= 2;
-  alloc->memory = realloc(alloc->memory, alloc->memory_size);
+  alloc->size = new_size;
+  alloc->memory = realloc(alloc->memory, alloc->size+WD_PADDING_SIZE);
+  
+  /* Re-add padding. */
+  memcpy(alloc->memory+alloc->size, wd_padding, WD_PADDING_SIZE);
   
   /* Verify outgoing values. */
   if (alloc->memory == NULL) {
     wd_alerts++;
     fail_at(file, line, WD_MSG_OUT_OF_MEMORY);
   }
+  
+  /* Reallocate snapshot memory. */
+  alloc->snapshot = realloc(alloc->snapshot, alloc->size);
+  if (alloc->snapshot == NULL) {
+    wd_alerts++;
+    fail_at(WD_STD_ARGS, WD_MSG_OUT_OF_MEMORY " (realloc %zu b)", new_size);
+  }
+  
   return alloc->memory;
 }
 
@@ -85,6 +123,10 @@ void wd_override_free(WD_STD_PARAMS, void *memory)
   /* Assert that this function runs in the right circumstances. */
   WD_ENSURE_UNLEASHED();
   
+  /* Check state. */
+  wd_bark(WD_STD_PARAMS_PASS);
+  
+  /* Free memory. */
   free(memory);
   
   /* Warn if freeing untracked memory. */

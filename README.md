@@ -21,7 +21,7 @@ Status|Work|Notes
 🏃|Reporter (handle output of information)|Functionality of alerts still unclear.
 🏃|Tracks (track control flow)|When will we show the tracks? Will we show them on SEGFAULTS, in the summary?
 🏃|Padding (catch buffer overflows)|
-❌|Snapshots (catch accidental memory modification)|
+🏃|Snapshots (catch accidental memory modification)|
 ❌|Dangling (track dangling pointers)|
 ❌|Usage (calculate real memory usage)|
 

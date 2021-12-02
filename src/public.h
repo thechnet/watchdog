@@ -1,10 +1,13 @@
 /*
 dogshed.h - watchdog
-Modified 2021-12-01
+Modified 2021-12-02
 */
 
 #ifndef WD_PUBLIC_H
 #define WD_PUBLIC_H
+
+/* Header-specific includes. */
+#include <stdlib.h>
 
 /*
 *** Public interface.

@@ -1,6 +1,6 @@
 /*
 radar.h - watchdog
-Modified 2021-12-01
+Modified 2021-12-02
 */
 
 #ifndef WD_RADAR_H
@@ -30,7 +30,7 @@ void wd_radar_enable(void);
 void wd_radar_disable(void);
 wd_alloc *wd_radar_find(WD_STD_PARAMS, char *memory);
 void wd_radar_grow(WD_STD_PARAMS);
-wd_alloc *wd_radar_watch(WD_STD_PARAMS, char *memory, size_t memory_size);
+wd_alloc *wd_radar_watch(WD_STD_PARAMS, char *memory, size_t size, bool check_padding);
 bool wd_radar_drop(WD_STD_PARAMS, char *memory);
 
 #endif

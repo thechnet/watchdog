@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include <string.h>
 
 #include "watchdog.h"
 
 int main(void)
 {
-  int *a = malloc(1);
-  a = realloc(a, 0);
+  char *a = malloc(5*sizeof(*a));
+  strcpy(a, "abcdefdsf");
+  a = realloc(a, 10);
   free(a);
   
-  wprintf(L"Done.\n");
+  printf("--- Summary:\n");
 }

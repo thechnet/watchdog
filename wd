@@ -11,3 +11,5 @@ src/public.c
 test.c
 
 -o build/test.exe
+
+-DWATCHDOG

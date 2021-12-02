@@ -27,6 +27,7 @@ Modified 2021-12-02
 #define WD_MSG_REALLOC_SIZE "Size smaller or same."
 #define WD_MSG_TRACK "Tracks."
 #define WD_MSG_PADDING "Padding not intact at " LOGGING_WHERE "."
+#define WD_MSG_SNAPSHOT "Snapshot changed at " LOGGING_WHERE "."
 
 #define WD_STD_PARAMS char *file, size_t line
 #define WD_STD_PARAMS_PASS file, line
@@ -44,8 +45,9 @@ typedef struct _wd_point {
 typedef struct _wd_alloc {
   wd_point origin;
   char *memory;
-  size_t memory_size;
+  size_t size;
   bool check_padding;
+  char *snapshot;
 } wd_alloc;
 
 /*
