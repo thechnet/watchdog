@@ -1,6 +1,6 @@
 /*
 overrides.c - watchdog
-Modified 2021-12-02
+Modified 2021-12-03
 */
 
 /* Header-specific includes. */
@@ -38,7 +38,7 @@ void *wd_override_malloc(WD_STD_PARAMS, size_t size)
   void *memory = malloc(size+WD_PADDING_SIZE);
   
   /* Remove address from dangling pointer record if previously recorded. */
-  void **pointer = wd_dangling_find(memory);
+  void **pointer = wd_dangling_find(WD_STD_PARAMS_PASS, memory);
   if (pointer != NULL)
     wd_dangling_erase(pointer);
   
@@ -108,7 +108,7 @@ void *wd_override_realloc(WD_STD_PARAMS, void *memory, size_t new_size)
   }
   
   /* Remove address from dangling pointer record if previously recorded. */
-  void **pointer = wd_dangling_find(memory_new);
+  void **pointer = wd_dangling_find(WD_STD_PARAMS_PASS, memory_new);
   if (pointer != NULL)
     wd_dangling_erase(pointer);
   
@@ -144,7 +144,7 @@ void wd_override_free(WD_STD_PARAMS, void *memory)
   free(memory);
   
   /* Record address in dangling pointer record. */
-  wd_dangling_record(memory);
+  wd_dangling_record(WD_STD_PARAMS_PASS, memory);
   
   /* Warn if freeing untracked memory. */
   if (!wd_radar_drop(WD_STD_ARGS, memory))

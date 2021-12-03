@@ -1,6 +1,6 @@
 /*
 public.c - watchdog
-Modified 2021-12-02
+Modified 2021-12-03
 */
 
 /* Header-specific includes. */
@@ -13,6 +13,8 @@ Modified 2021-12-02
 #include "tracks.h"
 #include "padding.h"
 #include "snapshots.h"
+#include "dangling.h"
+#include "usage.h"
 
 /*
 *** Globals.
@@ -34,6 +36,7 @@ void wd_restrain(void)
   
   wd_reporter_summary();
   wd_radar_disable();
+  wd_dangling_close();
   
   wd_unleashed = false;
 }
@@ -48,6 +51,9 @@ void wd_unleash(WD_STD_PARAMS)
   
   wd_radar_enable();
   wd_padding_generate();
+  wd_tracks_reset();
+  wd_dangling_open();
+  wd_usage_reset();
   
   if (atexit(wd_restrain) != 0) {
     wd_alerts++;

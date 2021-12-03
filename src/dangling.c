@@ -1,10 +1,13 @@
 /*
 dangling.c - watchdog
-Modified 2021-12-02
+Modified 2021-12-03
 */
 
 /* Header-specific includes. */
 #include "dangling.h"
+
+/* Implementation-specific includes. */
+#include "reporter.h"
 
 /*
 *** Dangling globals.
@@ -62,7 +65,7 @@ void wd_dangling_grow(WD_STD_PARAMS)
 /*
 Find an address in the dangling pointer record.
 */
-void **wd_dangling_find(void *address)
+void **wd_dangling_find(WD_STD_PARAMS, void *address)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -88,12 +91,12 @@ void **wd_dangling_find(void *address)
 /*
 Record an address as dangling pointer.
 */
-void wd_dangling_record(void *address)
+void wd_dangling_record(WD_STD_PARAMS, void *address)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_dangling != NULL);
   
-  void **pointer = wd_dangling_find(WD_DANGLING_EMPTY_SPOT);
+  void **pointer = wd_dangling_find(WD_STD_PARAMS_PASS, WD_DANGLING_EMPTY_SPOT);
   *pointer = address;
 }
 

@@ -1,6 +1,6 @@
 /*
 dogshed.h - watchdog
-Modified 2021-12-02
+Modified 2021-12-03
 */
 
 #ifndef WD_DOGSHED_H
@@ -28,6 +28,7 @@ Modified 2021-12-02
 #define WD_MSG_TRACK "Tracks."
 #define WD_MSG_PADDING "Padding not intact at " LOGGING_WHERE "."
 #define WD_MSG_SNAPSHOT "Snapshot changed at " LOGGING_WHERE "."
+#define WD_MSG_OUT_OF_BOUNDS "Index out of range. (%d of #%zu)"
 
 #define WD_STD_PARAMS char *file, size_t line
 #define WD_STD_PARAMS_PASS file, line

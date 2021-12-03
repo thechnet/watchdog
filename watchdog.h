@@ -34,6 +34,6 @@ Common functions.
 */
 
 // FIXME: Undef assert?
-#define assert(expr...) { wd_bark(WD_STD_ARGS); assert(expr); }
+// #define assert(expr...) { wd_bark(WD_STD_ARGS); assert(expr); }
 
 #endif /* !WATCHDOG_H */

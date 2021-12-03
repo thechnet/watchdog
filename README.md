@@ -23,7 +23,8 @@ Status|Work|Notes
 🏃|Padding (catch buffer overflows)|
 🏃|Snapshots (catch accidental memory modification)|
 🏃|Dangling (track dangling pointers)|
-❌|Usage (calculate real memory usage)|
+🏃|Usage (calculate real memory usage)|
+🏃|Manual bounds protection|
 
 ## Source Overview
 
