@@ -3,8 +3,8 @@ dogshed.h - watchdog
 Modified 2021-12-02
 */
 
-#ifndef WD_PRIVATE_H
-#define WD_PRIVATE_H
+#ifndef WD_DOGSHED_H
+#define WD_DOGSHED_H
 
 /* Header-specific includes. */
 #include <stdbool.h>
@@ -44,10 +44,10 @@ typedef struct _wd_point {
 
 typedef struct _wd_alloc {
   wd_point origin;
-  char *memory;
+  void *memory;
   size_t size;
   bool check_padding;
-  char *snapshot;
+  void *snapshot;
 } wd_alloc;
 
 /*

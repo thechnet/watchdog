@@ -29,4 +29,11 @@ Keywords.
 #define switch(__expr...) switch ((__expr)*wd_bark(WD_STD_ARGS))
 #define sizeof(__type) (sizeof(__type)*wd_bark(WD_STD_ARGS))
 
+/*
+Common functions.
+*/
+
+// FIXME: Undef assert?
+#define assert(expr...) { wd_bark(WD_STD_ARGS); assert(expr); }
+
 #endif /* !WATCHDOG_H */

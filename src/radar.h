@@ -28,9 +28,9 @@ extern size_t wd_radar_size;
 
 void wd_radar_enable(void);
 void wd_radar_disable(void);
-wd_alloc *wd_radar_find(WD_STD_PARAMS, char *memory);
+wd_alloc *wd_radar_find(WD_STD_PARAMS, void *memory);
 void wd_radar_grow(WD_STD_PARAMS);
-wd_alloc *wd_radar_watch(WD_STD_PARAMS, char *memory, size_t size, bool check_padding);
-bool wd_radar_drop(WD_STD_PARAMS, char *memory);
+wd_alloc *wd_radar_watch(WD_STD_PARAMS, void *memory, size_t size, bool check_padding);
+bool wd_radar_drop(WD_STD_PARAMS, void *memory);
 
 #endif

@@ -7,11 +7,12 @@ Modified 2021-12-02
 #include "overrides.h"
 
 /* Implementation-specific includes. */
+#include <memory.h>
 #include "radar.h"
 #include "reporter.h"
 #include "public.h"
 #include "padding.h"
-#include <memory.h>
+#include "dangling.h"
 
 /*
 *** Overrides.
@@ -35,6 +36,11 @@ void *wd_override_malloc(WD_STD_PARAMS, size_t size)
   
   /* Allocate memory. */
   void *memory = malloc(size+WD_PADDING_SIZE);
+  
+  /* Remove address from dangling pointer record if previously recorded. */
+  void **pointer = wd_dangling_find(memory);
+  if (pointer != NULL)
+    wd_dangling_erase(pointer);
   
   /* Add padding. */
   memcpy(memory+size, wd_padding, WD_PADDING_SIZE);
@@ -93,17 +99,25 @@ void *wd_override_realloc(WD_STD_PARAMS, void *memory, size_t new_size)
   memset(alloc->memory+alloc->size, WD_PADDING_CLEAR_CHAR, WD_PADDING_SIZE);
   
   /* Reallocate memory. */
-  alloc->size = new_size;
-  alloc->memory = realloc(alloc->memory, alloc->size+WD_PADDING_SIZE);
-  
-  /* Re-add padding. */
-  memcpy(alloc->memory+alloc->size, wd_padding, WD_PADDING_SIZE);
+  void *memory_new = realloc(alloc->memory, new_size+WD_PADDING_SIZE);
   
   /* Verify outgoing values. */
-  if (alloc->memory == NULL) {
+  if (memory_new == NULL) {
     wd_alerts++;
     fail_at(file, line, WD_MSG_OUT_OF_MEMORY);
   }
+  
+  /* Remove address from dangling pointer record if previously recorded. */
+  void **pointer = wd_dangling_find(memory_new);
+  if (pointer != NULL)
+    wd_dangling_erase(pointer);
+  
+  /* Confirm changes in radar. */
+  alloc->size = new_size;
+  alloc->memory = memory_new;
+  
+  /* Re-add padding. */
+  memcpy(alloc->memory+alloc->size, wd_padding, WD_PADDING_SIZE);
   
   /* Reallocate snapshot memory. */
   alloc->snapshot = realloc(alloc->snapshot, alloc->size);
@@ -128,6 +142,9 @@ void wd_override_free(WD_STD_PARAMS, void *memory)
   
   /* Free memory. */
   free(memory);
+  
+  /* Record address in dangling pointer record. */
+  wd_dangling_record(memory);
   
   /* Warn if freeing untracked memory. */
   if (!wd_radar_drop(WD_STD_ARGS, memory))

@@ -61,7 +61,7 @@ void wd_radar_disable(void)
 /*
 Locate an address on the radar.
 */
-wd_alloc *wd_radar_find(WD_STD_PARAMS, char *memory)
+wd_alloc *wd_radar_find(WD_STD_PARAMS, void *memory)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -72,7 +72,7 @@ wd_alloc *wd_radar_find(WD_STD_PARAMS, char *memory)
     if (alloc->memory == memory)
       break;
   
-  assert (alloc <= wd_radar+wd_radar_size);
+  assert(alloc <= wd_radar+wd_radar_size);
   if (alloc == wd_radar+wd_radar_size) {
     if (memory == WD_RADAR_EMPTY_SPOT) {
       wd_radar_grow(WD_STD_PARAMS_PASS);
@@ -98,14 +98,14 @@ void wd_radar_grow(WD_STD_PARAMS)
   wd_radar = realloc(wd_radar, wd_radar_size*sizeof(*wd_radar));
   if (wd_radar == NULL) {
     wd_alerts++;
-    fail_at(file, line, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", wd_radar_size);
+    fail_at(file, line, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", wd_radar_size*sizeof(*wd_radar));
   }
 }
 
 /*
 Start tracking an address on the radar.
 */
-wd_alloc *wd_radar_watch(WD_STD_PARAMS, char *memory, size_t size, bool check_padding)
+wd_alloc *wd_radar_watch(WD_STD_PARAMS, void *memory, size_t size, bool check_padding)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -126,7 +126,7 @@ wd_alloc *wd_radar_watch(WD_STD_PARAMS, char *memory, size_t size, bool check_pa
 /*
 Stop tracking an address on the radar.
 */
-bool wd_radar_drop(WD_STD_PARAMS, char *memory)
+bool wd_radar_drop(WD_STD_PARAMS, void *memory)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
