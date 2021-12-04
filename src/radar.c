@@ -8,13 +8,10 @@ Modified 2021-12-04
 
 /* Implementation-specific includes. */
 #include "reporter.h"
-
-/*
-*** Radar constants.
-*/
-
-#define WD_RADAR_SIZE ((size_t)4096)
-#define WD_RADAR_EMPTY_SPOT NULL
+#include "usage.h"
+#include "snapshots.h"
+#include "dangling.h"
+#include "padding.h"
 
 /*
 *** Radar globals.
@@ -35,6 +32,7 @@ void wd_radar_enable(void)
   /* Assert that this function runs in the right circumstances. */
   assert(!wd_unleashed);
   assert(wd_radar == NULL);
+  assert(wd_radar_size == 0);
   
   /* Allocate radar memory. */
   wd_radar_size = WD_RADAR_SIZE;
@@ -57,6 +55,7 @@ void wd_radar_disable(void)
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
   assert(wd_radar != NULL);
+  assert(wd_radar_size != 0);
   
   free(wd_radar);
   wd_radar = NULL;
@@ -66,17 +65,23 @@ void wd_radar_disable(void)
 /*
 Start tracking an address on the radar.
 */
-wd_alloc *wd_radar_add(WD_STD_PARAMS, void *memory, size_t size, bool check_padding)
+wd_alloc *wd_radar_add(WD_STD_PARAMS,
+  char *memory_virtual,
+  size_t size,
+  bool add_padding,
+  bool take_snapshots,
+  bool capture_original
+)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
   assert(wd_radar != NULL);
-  assert(memory != NULL);
+  assert(memory_virtual != NULL);
   
   /* Find the next free spot. */
   wd_alloc *alloc = wd_radar+wd_radar_size;
   for (size_t i=0; i<wd_radar_size; i++)
-    if (wd_radar[i].memory == NULL)
+    if (wd_radar[i].address == NULL)
       alloc = wd_radar+i;
   
   /* Grow the radar if no free spots are left. */
@@ -90,13 +95,30 @@ wd_alloc *wd_radar_add(WD_STD_PARAMS, void *memory, size_t size, bool check_padd
       wd_radar_clear(wd_radar+i);
   }
   
+  /* Store. */
   *alloc = (wd_alloc){
-    .memory = memory,
+    .point = (wd_point){ WD_STD_PARAMS_PASS },
     .size = size,
-    .origin = (wd_point){ WD_STD_PARAMS_PASS },
-    .check_padding = check_padding,
-    .snapshot = NULL
+    .address = memory_virtual,
+    .snapshot = NULL,
+    .original = NULL,
+    .padding_check_left = add_padding,
+    .padding_check_right = add_padding
   };
+  
+  /* Add padding. */
+  wd_padding_write(alloc);
+  
+  /* Take first snapshot. */
+  wd_snapshot_alloc(alloc);
+  wd_snapshot_capture(alloc);
+  
+  /* Capture original. */
+  wd_usage_original_capture(alloc);
+  
+  /* Remove address from dangling pointer record if recorded as dangling pointer. */
+  wd_dangling_find_and_erase(alloc->address);
+  
   return alloc;
 }
 
@@ -109,11 +131,15 @@ void wd_radar_drop(wd_alloc *alloc)
   assert(wd_unleashed);
   assert(wd_radar != NULL);
   assert(alloc != NULL);
-  assert(alloc->memory != NULL);
+  assert(alloc->address != NULL);
   
   // FIXME: Snapshots are allocated and reallocated at the function overrides.
   if (alloc->snapshot != NULL)
     free(alloc->snapshot);
+  
+  // FIXME: " ?
+  assert(alloc->original != NULL);
+  free(alloc->original);
   
   wd_radar_clear(alloc);
 }
@@ -124,9 +150,9 @@ Clear an entry in the radar.
 void wd_radar_clear(wd_alloc *alloc)
 {
   *alloc = (wd_alloc){
-    .memory = NULL,
+    .address = NULL,
     .size = 0,
-    .origin = (wd_point){ NULL, 0 },
+    .point = (wd_point){ NULL, 0 },
     .snapshot = NULL
   };
 }
@@ -134,7 +160,7 @@ void wd_radar_clear(wd_alloc *alloc)
 /*
 Locate an address on the radar.
 */
-wd_alloc *wd_radar_search(void *memory)
+wd_alloc *wd_radar_search(char *memory)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -142,7 +168,7 @@ wd_alloc *wd_radar_search(void *memory)
   assert(memory != NULL);
   
   for (size_t i=0; i<wd_radar_size; i++)
-    if (wd_radar[i].memory == memory)
+    if (wd_radar[i].address == memory)
       return wd_radar+i;
   
   return NULL;

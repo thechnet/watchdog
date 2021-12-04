@@ -13,6 +13,6 @@ Modified 2021-12-04
 *** Bounds interface.
 */
 
-int wd_bounds_check(char *file, size_t line, void *array, size_t array_size, size_t item_size, int index);
+int wd_bounds_check(char *file, size_t line, char *array, size_t array_size, size_t item_size, int index);
 
 #endif /* !WD_BOUNDS_H */

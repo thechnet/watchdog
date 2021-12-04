@@ -10,7 +10,8 @@ Modified 2021-12-04
 #include <string.h>
 #include <signal.h>
 #ifdef _WIN32
-#include <windows.h>
+#include <io.h>
+#define STDOUT_FILENO 1
 #define write(fd, buffer, count) _write(fd, buffer, count)
 #else
 #include <unistd.h>

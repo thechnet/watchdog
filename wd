@@ -15,3 +15,7 @@ test.c
 -o build/test.exe
 
 -DWATCHDOG
+
+-Wno-deprecated-declarations
+
+-g

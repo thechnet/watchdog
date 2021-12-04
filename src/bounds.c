@@ -20,7 +20,7 @@ Modified 2021-12-04
 /*
 Check bounds on an array.
 */
-int wd_bounds_check(WD_STD_PARAMS, void *array, size_t array_size, size_t item_size, int index)
+int wd_bounds_check(WD_STD_PARAMS, char *array, size_t array_size, size_t item_size, int index)
 {
   /* Assert that this function runs in the right circumstances. */
   if (array == NULL) {

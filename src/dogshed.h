@@ -9,7 +9,8 @@ Modified 2021-12-04
 /* Header-specific includes. */
 #include <stdbool.h>
 #include <assert.h>
-#include "../logging/escseq.h" // FIXME: It is currently required to include escseq before logging here to avoid defining the escape sequences as wide-character strings.
+#include "../logging/escseq.h" // FIXME: It is currently required to include escseq before logging
+                               // here to avoid defining the escape sequences as wide-character strings.
 #define LOGGING_WIDE
 #define LOGGING_ID "watchdog"
 #include "../logging/logging.h"
@@ -17,6 +18,10 @@ Modified 2021-12-04
 /*
 *** Constants.
 */
+
+#define WD_STD_PARAMS char *file, size_t line
+#define WD_STD_PARAMS_PASS file, line
+#define WD_STD_ARGS __FILE__, __LINE__
 
 #define WD_MSG_OUT_OF_MEMORY "Out of memory – Wanted %zu(+%zu) b."
 #define WD_MSG_OUT_OF_MEMORY_INTERNAL "(Internal) Out of memory – Wanted %zu+%zu b."
@@ -28,7 +33,8 @@ Modified 2021-12-04
 #define WD_MSG_INCOMING_NULL "Incoming NULL pointer."
 #define WD_MSG_REALLOC_SIZE "Size smaller or same."
 #define WD_MSG_TRACK "Tracks."
-#define WD_MSG_PADDING "Padding not intact at " LOGGING_WHERE "."
+#define WD_MSG_PADDING_LEFT "Left padding not intact at " LOGGING_WHERE "."
+#define WD_MSG_PADDING_RIGHT "Right padding not intact at " LOGGING_WHERE "."
 #define WD_MSG_SNAPSHOT "Snapshot changed at " LOGGING_WHERE "."
 #define WD_MSG_OUT_OF_BOUNDS "Index out of range. (%d of #%zu)"
 #define WD_MSG_SIGNAL "signal failed. Not catching signals."
@@ -37,10 +43,6 @@ Modified 2021-12-04
 #define WD_MSG_SIGSEGV "Segmentation fault."
 #define WD_MSG_INCOMING_DANGLING "Incoming dangling pointer (freed at " LOGGING_WHERE ")."
 #define WD_MSG_ASSERT "Assertion failed: %s"
-
-#define WD_STD_PARAMS char *file, size_t line
-#define WD_STD_PARAMS_PASS file, line
-#define WD_STD_ARGS __FILE__, __LINE__
 
 /*
 *** Types.
@@ -58,13 +60,6 @@ typedef struct _wd_point {
 extern bool wd_unleashed;
 
 /*
-*** Main interface.
-*/
-
-void wd_restrain(void);
-void wd_unleash(WD_STD_PARAMS);
-
-/*
 *** Preprocessor functions.
 */
 
@@ -77,5 +72,13 @@ void wd_unleash(WD_STD_PARAMS);
     wd_alerts++;\
     fail_at(WD_STD_ARGS, WD_MSG_OUT_OF_MEMORY_INTERNAL, alloc_size, size_markup);\
   }
+
+/*
+*** Main interface.
+*/
+
+// FIXME:?
+void wd_restrain(void);
+void wd_unleash(WD_STD_PARAMS);
 
 #endif

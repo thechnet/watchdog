@@ -73,11 +73,11 @@ int wd_bark(WD_STD_PARAMS)
   WD_ENSURE_UNLEASHED();
   
   for (size_t i=0; i<wd_radar_size; i++)
-    if (wd_radar[i].memory != NULL) {
-      if (wd_radar[i].check_padding)
+    if (wd_radar[i].address != NULL) {
+      if (wd_radar[i].padding_check_left || wd_radar[i].padding_check_right)
         wd_padding_check(WD_STD_PARAMS_PASS, wd_radar+i);
       if (wd_radar[i].snapshot != NULL)
-        wd_snapshot_check(WD_STD_PARAMS_PASS, wd_radar+i);
+        wd_snapshot_compare(WD_STD_PARAMS_PASS, wd_radar+i);
     }
   
   wd_tracks_update(WD_STD_PARAMS_PASS);

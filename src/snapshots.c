@@ -35,20 +35,20 @@ void wd_snapshot_realloc(wd_alloc *alloc)
 /*
 Take snapshot.
 */
-void wd_snapshot_take(wd_alloc *alloc)
+void wd_snapshot_capture(wd_alloc *alloc)
 {
-  memcpy(alloc->snapshot, alloc->memory, alloc->size);
+  memcpy(alloc->snapshot, alloc->address, alloc->size);
 }
 
 /*
 Check snapshot.
 */
-void wd_snapshot_check(WD_STD_PARAMS, wd_alloc *alloc)
+void wd_snapshot_compare(WD_STD_PARAMS, wd_alloc *alloc)
 {
   assert(alloc->snapshot != NULL);
   
-  if (memcmp(alloc->memory, alloc->snapshot, alloc->size) != 0) {
-    warn_at(alloc->origin.file, alloc->origin.line, WD_MSG_SNAPSHOT, WD_STD_PARAMS_PASS);
-    wd_snapshot_take(alloc);
+  if (memcmp(alloc->address, alloc->snapshot, alloc->size) != 0) {
+    warn_at(alloc->point.file, alloc->point.line, WD_MSG_SNAPSHOT, WD_STD_PARAMS_PASS);
+    wd_snapshot_capture(alloc);
   }
 }

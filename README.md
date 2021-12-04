@@ -12,20 +12,21 @@ This project is built from scratch, but not without prior knowledge. I am basing
 
 > ❌ Yet to start.  
 > 🏃 In progress...  
-> ✅ Finished and working.  
+> ✅ Finished.  
+> ✔️ Tested and working.  
 
 Status|Work|Notes
 -|-|-
 🏃|Set up basic infrastructure.|Remove WD_STD_PARAMS for functions that do not need them. Ensure header inclusions make sense. Expose WD_STD_PARAMS? Replace integral types with (u)int64_t. Expose simplified wd_bark.
-🏃|Radar (track unfreed allocations)|Testing required. Seperate _find and _find_free_spot.
+✅|Radar (track unfreed allocations)|Requires testing.
 🏃|Reporter (handle output of information)|Functionality of alerts still unclear.
-🏃|Tracks (track control flow)|When will we show the tracks? Will we show them on SEGFAULTS, in the summary?
-🏃|Padding (catch buffer overflows)|Also add padding to the *left* of the memory?
-🏃|Snapshots (catch accidental memory modification)|
-🏃|Dangling (track dangling pointers)|Combine wd_dangling with wd_radar.
-🏃|Usage (calculate real memory usage)|Track actual used memory.
-🏃|Manual bounds protection|
-🏃|Signals|Signal interception|
+✅|Tracks (track control flow)|
+✅|Padding (catch buffer overflows)|
+✅|Snapshots (catch accidental memory modification)|
+✅|Dangling (track dangling pointers)|
+🏃|Usage (calculate real memory usage)|Track actual used memory [NOT WORKING YET]
+✅|Manual bounds protection|
+✅|Signals (Signal interception)|
 ❌|Rework logging header|Seperate project, add more customizable logging styles. Maybe improve escseq, too?
 
 ## Source Overview

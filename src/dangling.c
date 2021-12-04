@@ -65,7 +65,7 @@ void wd_dangling_grow(WD_STD_PARAMS)
 /*
 Find an address in the dangling pointer record.
 */
-wd_dangling_pointer *wd_dangling_find(WD_STD_PARAMS, void *address)
+wd_dangling_pointer *wd_dangling_find(WD_STD_PARAMS, char *address)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -91,7 +91,7 @@ wd_dangling_pointer *wd_dangling_find(WD_STD_PARAMS, void *address)
 /*
 Record an address as dangling pointer.
 */
-void wd_dangling_record(WD_STD_PARAMS, void *address)
+void wd_dangling_record(WD_STD_PARAMS, char *address)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_dangling != NULL);
@@ -126,7 +126,7 @@ void wd_dangling_erase(wd_dangling_pointer *pointer)
 /*
 If present, erase an address from the record of dangling pointers.
 */
-bool wd_dangling_find_and_erase(void *address)
+bool wd_dangling_find_and_erase(char *address)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_dangling != NULL);

@@ -29,7 +29,6 @@ Populate padding array.
 */
 void wd_padding_generate(void)
 {
-  // TODO: Just use srand(time(NULL))? [https://www.cplusplus.com/reference/cstdlib/srand/]
   srand(time(NULL));
   for (int i=0; i<WD_PADDING_SIZE; i++)
     wd_padding[i] = rand() % CHAR_MAX;
@@ -44,14 +43,25 @@ void wd_padding_check(WD_STD_PARAMS, wd_alloc *alloc)
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
   assert(wd_padding_generated);
-  assert(alloc->check_padding);
-  assert(alloc->memory != NULL);
+  assert(alloc->padding_check_left || alloc->padding_check_right);
+  assert(alloc->address != NULL);
   
-  /* Check padding. */
-  if (memcmp(alloc->memory+alloc->size, wd_padding, WD_PADDING_SIZE) != 0) {
-    alloc->check_padding = false;
+  /*
+  Check padding.
+  */
+  
+  /* Left. */
+  if (alloc->padding_check_left && memcmp(alloc->address-WD_PADDING_SIZE, wd_padding, WD_PADDING_SIZE) != 0) {
+    alloc->padding_check_left = false;
     wd_alerts++;
-    warn_at(alloc->origin.file, alloc->origin.line, WD_MSG_PADDING, WD_STD_PARAMS_PASS);
+    warn_at(alloc->point.file, alloc->point.line, WD_MSG_PADDING_LEFT, WD_STD_PARAMS_PASS);
+  }
+  
+  /* Right. */
+  if (alloc->padding_check_right && memcmp(alloc->address+alloc->size, wd_padding, WD_PADDING_SIZE) != 0) {
+    alloc->padding_check_right = false;
+    wd_alerts++;
+    warn_at(alloc->point.file, alloc->point.line, WD_MSG_PADDING_RIGHT, WD_STD_PARAMS_PASS);
   }
 }
 
@@ -61,7 +71,8 @@ Write padding to the end of an allocation.
 void wd_padding_write(wd_alloc *alloc)
 {
   assert(wd_padding_generated);
-  memcpy(alloc->memory+alloc->size, wd_padding, WD_PADDING_SIZE);
+  memcpy(alloc->address-WD_PADDING_SIZE, wd_padding, WD_PADDING_SIZE);
+  memcpy(alloc->address+alloc->size, wd_padding, WD_PADDING_SIZE);
 }
 
 /*
@@ -69,5 +80,6 @@ Clear padding from the end of an allocation.
 */
 void wd_padding_clear(wd_alloc *alloc)
 {
-  memset(alloc->memory+alloc->size, WD_PADDING_CLEAR_CHAR, WD_PADDING_SIZE);
+  memset(alloc->address-WD_PADDING_SIZE, WD_PADDING_CLEAR_CHAR, WD_PADDING_SIZE);
+  memset(alloc->address+alloc->size, WD_PADDING_CLEAR_CHAR, WD_PADDING_SIZE);
 }

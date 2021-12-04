@@ -25,6 +25,13 @@ extern char wd_padding[WD_PADDING_SIZE];
 extern bool wd_padding_generated;
 
 /*
+*** Padding preprocessor functions.
+*/
+
+#define WD_TO_REAL(address_virtual) (address_virtual-WD_PADDING_SIZE)
+#define WD_TO_VIRTUAL(address_real) (address_real+WD_PADDING_SIZE)
+
+/*
 *** Padding interface.
 */
 

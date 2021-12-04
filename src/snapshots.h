@@ -16,7 +16,7 @@ Modified 2021-12-04
 
 void wd_snapshot_alloc(wd_alloc *alloc);
 void wd_snapshot_realloc(wd_alloc *alloc);
-void wd_snapshot_take(wd_alloc *alloc);
-void wd_snapshot_check(WD_STD_PARAMS, wd_alloc *alloc);
+void wd_snapshot_capture(wd_alloc *alloc);
+void wd_snapshot_compare(WD_STD_PARAMS, wd_alloc *alloc);
 
 #endif /* !WD_SNAPSHOTS_H */

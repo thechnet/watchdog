@@ -21,7 +21,7 @@ Modified 2021-12-04
 */
 
 typedef struct _wd_dangling_pointer {
-  void *address;
+  char *address;
   wd_point freed_at;
 } wd_dangling_pointer;
 
@@ -38,9 +38,9 @@ extern wd_dangling_pointer *wd_dangling;
 
 void wd_dangling_open(void);
 void wd_dangling_close(void);
-wd_dangling_pointer *wd_dangling_find(WD_STD_PARAMS, void *address);
-void wd_dangling_record(WD_STD_PARAMS, void *address);
+wd_dangling_pointer *wd_dangling_find(WD_STD_PARAMS, char *address);
+void wd_dangling_record(WD_STD_PARAMS, char *address);
 void wd_dangling_erase(wd_dangling_pointer *pointer);
-bool wd_dangling_find_and_erase(void *address);
+bool wd_dangling_find_and_erase(char *address);
 
 #endif /* !WD_DANGLING_H */
