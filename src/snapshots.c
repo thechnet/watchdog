@@ -1,6 +1,6 @@
 /*
 snapshots.c - watchdog
-Modified 2021-12-02
+Modified 2021-12-04
 */
 
 /* Header-specific includes. */
@@ -8,10 +8,29 @@ Modified 2021-12-02
 
 /* Implementation-specific includes. */
 #include <memory.h>
+#include "reporter.h"
 
 /*
 *** Snapshots interface.
 */
+
+/*
+Allocate snapshot memory.
+*/
+void wd_snapshot_alloc(wd_alloc *alloc)
+{
+  alloc->snapshot = malloc(alloc->size);
+  WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->snapshot, alloc->size, 0);
+}
+
+/*
+Reallocate snapshot memory.
+*/
+void wd_snapshot_realloc(wd_alloc *alloc)
+{
+  alloc->snapshot = realloc(alloc->snapshot, alloc->size);
+  WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->snapshot, alloc->size, 0);
+}
 
 /*
 Take snapshot.

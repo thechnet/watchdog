@@ -14,6 +14,7 @@ Modified 2021-12-04
 #include "public.h"
 #include "padding.h"
 #include "dangling.h"
+#include "snapshots.h"
 
 /*
 *** Overrides.
@@ -24,45 +25,26 @@ Override malloc.
 */
 void *wd_override_malloc(WD_STD_PARAMS, size_t size)
 {
-  /* Assert that this function runs in the right circumstances. */
   WD_ENSURE_UNLEASHED();
-  assert(wd_padding_generated);
-  
-  /* Check state. */
   wd_bark(WD_STD_PARAMS_PASS);
   
   /* Verify incoming values. */
-  if (size == 0)
-    warn_at(file, line, WD_MSG_SIZE_0); // FIXME: Find solution to WD_STD_PARAMS_PASS.
+  WD_WARN_IF_SIZE_0(size);
   
   /* Allocate memory. */
   void *memory = malloc(size+WD_PADDING_SIZE);
   
-  /* Remove address from dangling pointer record if previously recorded. */
-  void **pointer = wd_dangling_find(WD_STD_PARAMS_PASS, memory);
-  if (pointer != NULL)
-    wd_dangling_erase(pointer);
-  
-  /* Add padding. */
-  memcpy(memory+size, wd_padding, WD_PADDING_SIZE);
-  
   /* Verify outgoing values. */
-  if (memory == NULL) {
-    wd_alerts++;
-    fail_at(WD_STD_PARAMS_PASS, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", size);
-  }
+  WD_FAIL_IF_OUT_OF_MEMORY(memory, size, WD_PADDING_SIZE);
   
   /* Add to radar. */
-  wd_alloc *alloc = wd_radar_watch(WD_STD_PARAMS_PASS, memory, size, true);
+  wd_alloc *alloc = wd_radar_add(WD_STD_PARAMS_PASS, memory, size, true);
+  wd_padding_write(alloc);
+  wd_dangling_find_and_erase(alloc->memory);
+  wd_snapshot_alloc(alloc);
+  wd_snapshot_take(alloc);
   
-  /* Allocate snapshot memory. */
-  alloc->snapshot = malloc(size);
-  if (alloc->snapshot == NULL) {
-    wd_alerts++;
-    fail_at(WD_STD_ARGS, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", size);
-  }
-  
-  return memory;
+  return alloc->memory;
 }
 
 /*
@@ -70,62 +52,41 @@ Override realloc.
 */
 void *wd_override_realloc(WD_STD_PARAMS, void *memory, size_t new_size)
 {
-  /* Assert that this function runs in the right circumstances. */
   WD_ENSURE_UNLEASHED();
-  assert(wd_padding_generated);
-  
-  /* Check state. */
   wd_bark(WD_STD_PARAMS_PASS);
   
   /* Verify incoming values. */
-  if (memory == NULL) {
-    wd_alerts++;
-    fail_at(file, line, WD_MSG_INCOMING_NULL);
-  }
-  if (new_size == 0) {
-    wd_alerts++;
-    warn_at(file, line, WD_MSG_SIZE_0); // FIXME: Find solution to WD_STD_PARAMS_PASS.
-  }
-  wd_alloc *alloc = wd_radar_find(WD_STD_PARAMS_PASS, memory);
-  if (alloc == NULL) {
-    wd_alerts++;
-    fail_at(file, line, WD_MSG_UNTRACKED_MEMORY);
-  }
-  if (new_size <= alloc->size) {
-    wd_alerts++;
-    warn_at(file, line, WD_MSG_REALLOC_SIZE);
-  }
+  WD_WARN_IF_PTR_NULL(memory);
+  WD_WARN_IF_PTR_DANGLING(memory);
+  WD_WARN_IF_SIZE_0(new_size);
+  
+  wd_alloc *alloc = wd_radar_search(memory);
+  
+  WD_WARN_IF_RADAR_FINDS_PTR_UNTRACKED(alloc);
+  WD_WARN_IF_SIZE_REDUCED(alloc->size, new_size);
   
   /* Temporarily remove padding. */
-  memset(alloc->memory+alloc->size, WD_PADDING_CLEAR_CHAR, WD_PADDING_SIZE);
+  wd_padding_clear(alloc);
   
   /* Reallocate memory. */
   void *memory_new = realloc(alloc->memory, new_size+WD_PADDING_SIZE);
   
   /* Verify outgoing values. */
-  if (memory_new == NULL) {
-    wd_alerts++;
-    fail_at(file, line, WD_MSG_OUT_OF_MEMORY);
-  }
-  
-  /* Remove address from dangling pointer record if previously recorded. */
-  void **pointer = wd_dangling_find(WD_STD_PARAMS_PASS, memory_new);
-  if (pointer != NULL)
-    wd_dangling_erase(pointer);
+  WD_FAIL_IF_OUT_OF_MEMORY(memory_new, new_size, WD_PADDING_SIZE);
   
   /* Confirm changes in radar. */
   alloc->size = new_size;
   alloc->memory = memory_new;
   
-  /* Re-add padding. */
-  memcpy(alloc->memory+alloc->size, wd_padding, WD_PADDING_SIZE);
+  /* Remove address from dangling pointer record if previously recorded. */
+  wd_dangling_find_and_erase(memory_new);
   
-  /* Reallocate snapshot memory. */
-  alloc->snapshot = realloc(alloc->snapshot, alloc->size);
-  if (alloc->snapshot == NULL) {
-    wd_alerts++;
-    fail_at(WD_STD_ARGS, WD_MSG_OUT_OF_MEMORY " (realloc %zu b)", new_size);
-  }
+  /* Re-add padding. */
+  wd_padding_write(alloc);
+  
+  /* Update snapshot. */
+  wd_snapshot_realloc(alloc);
+  wd_snapshot_take(alloc);
   
   return alloc->memory;
 }
@@ -135,11 +96,12 @@ Override free.
 */
 void wd_override_free(WD_STD_PARAMS, void *memory)
 {
-  /* Assert that this function runs in the right circumstances. */
   WD_ENSURE_UNLEASHED();
-  
-  /* Check state. */
   wd_bark(WD_STD_PARAMS_PASS);
+  
+  /* Verify incoming values. */
+  WD_WARN_IF_PTR_NULL(memory);
+  WD_WARN_IF_PTR_DANGLING(memory);
   
   /* Free memory. */
   free(memory);
@@ -147,9 +109,12 @@ void wd_override_free(WD_STD_PARAMS, void *memory)
   /* Record address in dangling pointer record. */
   wd_dangling_record(WD_STD_PARAMS_PASS, memory);
   
-  /* Warn if freeing untracked memory. */
-  if (!wd_radar_drop(WD_STD_ARGS, memory))
-    warn_at(WD_STD_PARAMS_PASS, WD_MSG_UNTRACKED_MEMORY " (%p)", memory);
+  wd_alloc *alloc = wd_radar_search(memory);
+  
+  /* Warn if freeing untracked memory, otherwise remove memory from radar. */
+  WD_WARN_IF_RADAR_FINDS_PTR_UNTRACKED(alloc);
+  if (alloc != NULL)
+    wd_radar_drop(alloc);
 }
 
 /*
@@ -159,5 +124,5 @@ void wd_override_assert(WD_STD_PARAMS, char *assertion_string, int assertion)
 {
   if (assertion)
     return;
-  fail_at(file, line, "Assertion failed: %s", assertion_string); // FIXME: MSG
+  fail_at(file, line, WD_MSG_ASSERT, assertion_string);
 }

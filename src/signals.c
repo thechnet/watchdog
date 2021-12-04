@@ -8,6 +8,7 @@ Modified 2021-12-04
 
 /* Implementation-specific includes. */
 #include <string.h>
+#include <signal.h>
 #ifdef _WIN32
 #include <windows.h>
 #define write(fd, buffer, count) _write(fd, buffer, count)

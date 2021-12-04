@@ -1,6 +1,6 @@
 /*
 dangling.h - watchdog
-Modified 2021-12-03
+Modified 2021-12-04
 */
 
 #ifndef WD_DANGLING_H
@@ -17,11 +17,20 @@ Modified 2021-12-03
 #define WD_DANGLING_EMPTY_SPOT NULL
 
 /*
+*** Dangling types.
+*/
+
+typedef struct _wd_dangling_pointer {
+  void *address;
+  wd_point freed_at;
+} wd_dangling_pointer;
+
+/*
 *** Dangling globals.
 */
 
-extern void **wd_dangling;
 extern size_t wd_dangling_size;
+extern wd_dangling_pointer *wd_dangling;
 
 /*
 *** Dangling interface.
@@ -29,8 +38,9 @@ extern size_t wd_dangling_size;
 
 void wd_dangling_open(void);
 void wd_dangling_close(void);
-void **wd_dangling_find(WD_STD_PARAMS, void *address);
+wd_dangling_pointer *wd_dangling_find(WD_STD_PARAMS, void *address);
 void wd_dangling_record(WD_STD_PARAMS, void *address);
-void wd_dangling_erase(void **pointer);
+void wd_dangling_erase(wd_dangling_pointer *pointer);
+bool wd_dangling_find_and_erase(void *address);
 
 #endif /* !WD_DANGLING_H */

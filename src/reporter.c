@@ -1,6 +1,6 @@
 /*
 reporter.c - watchdog
-Modified 2021-11-30
+Modified 2021-12-04
 */
 
 /* Header-specific includes. */
@@ -39,7 +39,4 @@ void wd_reporter_summary(void)
     }
   if (radar_empty)
     success(WD_MSG_ALL_FREED);
-  
-  /* Show last tracks. */
-  info_at(wd_track.file, wd_track.line, WD_MSG_TRACK);
 }

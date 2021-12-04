@@ -1,6 +1,6 @@
 /*
 radar.h - watchdog
-Modified 2021-12-02
+Modified 2021-12-04
 */
 
 #ifndef WD_RADAR_H
@@ -10,10 +10,16 @@ Modified 2021-12-02
 #include "dogshed.h"
 
 /*
-*** Radar constants.
+*** Radar types.
 */
 
-#define WD_RADAR_EMPTY_SPOT NULL
+typedef struct _wd_alloc {
+  wd_point origin;
+  void *memory;
+  size_t size;
+  bool check_padding;
+  void *snapshot;
+} wd_alloc;
 
 /*
 *** Radar globals.
@@ -28,9 +34,12 @@ extern size_t wd_radar_size;
 
 void wd_radar_enable(void);
 void wd_radar_disable(void);
-wd_alloc *wd_radar_find(WD_STD_PARAMS, void *memory);
-void wd_radar_grow(WD_STD_PARAMS);
-wd_alloc *wd_radar_watch(WD_STD_PARAMS, void *memory, size_t size, bool check_padding);
-bool wd_radar_drop(WD_STD_PARAMS, void *memory);
+
+wd_alloc *wd_radar_add(WD_STD_PARAMS, void *memory, size_t size, bool check_padding);
+void wd_radar_drop(wd_alloc *alloc);
+
+void wd_radar_clear(wd_alloc *alloc);
+
+wd_alloc *wd_radar_search(void *memory);
 
 #endif

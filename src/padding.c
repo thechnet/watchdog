@@ -1,6 +1,6 @@
 /*
 padding.c - watchdog
-Modified 2021-12-02
+Modified 2021-12-04
 */
 
 /* Header-specific includes. */
@@ -53,4 +53,21 @@ void wd_padding_check(WD_STD_PARAMS, wd_alloc *alloc)
     wd_alerts++;
     warn_at(alloc->origin.file, alloc->origin.line, WD_MSG_PADDING, WD_STD_PARAMS_PASS);
   }
+}
+
+/*
+Write padding to the end of an allocation.
+*/
+void wd_padding_write(wd_alloc *alloc)
+{
+  assert(wd_padding_generated);
+  memcpy(alloc->memory+alloc->size, wd_padding, WD_PADDING_SIZE);
+}
+
+/*
+Clear padding from the end of an allocation.
+*/
+void wd_padding_clear(wd_alloc *alloc)
+{
+  memset(alloc->memory+alloc->size, WD_PADDING_CLEAR_CHAR, WD_PADDING_SIZE);
 }

@@ -1,6 +1,6 @@
 /*
 radar.c - watchdog
-Modified 2021-12-02
+Modified 2021-12-04
 */
 
 /* Header-specific includes. */
@@ -36,12 +36,17 @@ void wd_radar_enable(void)
   assert(!wd_unleashed);
   assert(wd_radar == NULL);
   
+  /* Allocate radar memory. */
   wd_radar_size = WD_RADAR_SIZE;
   wd_radar = malloc(wd_radar_size*sizeof(*wd_radar));
   if (wd_radar == NULL) {
     wd_alerts++;
     fail_at(WD_STD_ARGS, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", wd_radar_size);
   }
+  
+  /* Clear uninitialized allocations. */
+  for (size_t i=0; i<wd_radar_size; i++)
+    wd_radar_clear(wd_radar+i);
 }
 
 /*
@@ -59,60 +64,32 @@ void wd_radar_disable(void)
 }
 
 /*
-Locate an address on the radar.
-*/
-wd_alloc *wd_radar_find(WD_STD_PARAMS, void *memory)
-{
-  /* Assert that this function runs in the right circumstances. */
-  assert(wd_unleashed);
-  assert(wd_radar != NULL);
-  
-  wd_alloc *alloc;
-  for (alloc=wd_radar; alloc<wd_radar+wd_radar_size; alloc++)
-    if (alloc->memory == memory)
-      break;
-  
-  assert(alloc <= wd_radar+wd_radar_size);
-  if (alloc == wd_radar+wd_radar_size) {
-    if (memory == WD_RADAR_EMPTY_SPOT) {
-      wd_radar_grow(WD_STD_PARAMS_PASS);
-      alloc = wd_radar+wd_radar_size/2;
-    } else {
-      return NULL;
-    }
-  }
-  return alloc;
-}
-
-/*
-Double the radar size.
-*/
-void wd_radar_grow(WD_STD_PARAMS)
-{
-  /* Assert that this function runs in the right circumstances. */
-  assert(wd_unleashed);
-  assert(wd_radar != NULL);
-  assert(wd_radar_size > 0);
-  
-  wd_radar_size *= 2;
-  wd_radar = realloc(wd_radar, wd_radar_size*sizeof(*wd_radar));
-  if (wd_radar == NULL) {
-    wd_alerts++;
-    fail_at(file, line, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", wd_radar_size*sizeof(*wd_radar));
-  }
-}
-
-/*
 Start tracking an address on the radar.
 */
-wd_alloc *wd_radar_watch(WD_STD_PARAMS, void *memory, size_t size, bool check_padding)
+wd_alloc *wd_radar_add(WD_STD_PARAMS, void *memory, size_t size, bool check_padding)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
   assert(wd_radar != NULL);
+  assert(memory != NULL);
   
-  wd_alloc *alloc = wd_radar_find(WD_STD_PARAMS_PASS, WD_RADAR_EMPTY_SPOT);
-  assert(alloc != NULL);
+  /* Find the next free spot. */
+  wd_alloc *alloc = wd_radar+wd_radar_size;
+  for (size_t i=0; i<wd_radar_size; i++)
+    if (wd_radar[i].memory == NULL)
+      alloc = wd_radar+i;
+  
+  /* Grow the radar if no free spots are left. */
+  if (alloc == wd_radar+wd_radar_size) {
+    wd_radar_size *= 2;
+    wd_radar = realloc(wd_radar, wd_radar_size*sizeof(*wd_radar));
+    WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(wd_radar, wd_radar_size*sizeof(*wd_radar), 0);
+    
+    /* Initialize the newly added spots. */
+    for (size_t i=wd_radar_size/2; i<wd_radar_size; i++)
+      wd_radar_clear(wd_radar+i);
+  }
+  
   *alloc = (wd_alloc){
     .memory = memory,
     .size = size,
@@ -126,25 +103,47 @@ wd_alloc *wd_radar_watch(WD_STD_PARAMS, void *memory, size_t size, bool check_pa
 /*
 Stop tracking an address on the radar.
 */
-bool wd_radar_drop(WD_STD_PARAMS, void *memory)
+void wd_radar_drop(wd_alloc *alloc)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
   assert(wd_radar != NULL);
-  
-  wd_alloc *alloc = wd_radar_find(WD_STD_PARAMS_PASS, memory);
-  if (alloc == NULL)
-    return false;
+  assert(alloc != NULL);
+  assert(alloc->memory != NULL);
   
   // FIXME: Snapshots are allocated and reallocated at the function overrides.
   if (alloc->snapshot != NULL)
     free(alloc->snapshot);
   
+  wd_radar_clear(alloc);
+}
+
+/*
+Clear an entry in the radar.
+*/
+void wd_radar_clear(wd_alloc *alloc)
+{
   *alloc = (wd_alloc){
     .memory = NULL,
     .size = 0,
     .origin = (wd_point){ NULL, 0 },
     .snapshot = NULL
   };
-  return true;
+}
+
+/*
+Locate an address on the radar.
+*/
+wd_alloc *wd_radar_search(void *memory)
+{
+  /* Assert that this function runs in the right circumstances. */
+  assert(wd_unleashed);
+  assert(wd_radar != NULL);
+  assert(memory != NULL);
+  
+  for (size_t i=0; i<wd_radar_size; i++)
+    if (wd_radar[i].memory == memory)
+      return wd_radar+i;
+  
+  return NULL;
 }

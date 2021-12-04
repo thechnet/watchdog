@@ -11,6 +11,7 @@ Modified 2021-12-04
 #include "radar.h"
 #include "reporter.h"
 #include "public.h"
+#include "dangling.h"
 
 /*
 *** Bounds interface.
@@ -32,9 +33,16 @@ int wd_bounds_check(WD_STD_PARAMS, void *array, size_t array_size, size_t item_s
   /* Check state. */
   wd_bark(WD_STD_PARAMS_PASS);
   
+  /* Verify incoming values. */
+  wd_dangling_pointer *pointer = wd_dangling_find(WD_STD_PARAMS_PASS, array);
+  if (pointer != NULL) {
+    wd_alerts++;
+    warn_at(file, line, WD_MSG_INCOMING_DANGLING, pointer->freed_at.file, pointer->freed_at.line);
+  }
+  
   /* Get array properties. */
   bool is_stack_array = false;
-  wd_alloc *alloc = wd_radar_find(WD_STD_PARAMS_PASS, array);
+  wd_alloc *alloc = wd_radar_search(array);
   if (alloc == NULL)
     is_stack_array = true;
     // FIXME: OR the incoming pointer is wrong

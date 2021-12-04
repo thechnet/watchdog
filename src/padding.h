@@ -1,6 +1,6 @@
 /*
 padding.h - watchdog
-Modified 2021-12-02
+Modified 2021-12-04
 */
 
 #ifndef WD_PADDING_H
@@ -8,6 +8,7 @@ Modified 2021-12-02
 
 /* Header-specific includes. */
 #include "dogshed.h"
+#include "radar.h"
 
 /*
 *** Padding constants.
@@ -29,5 +30,7 @@ extern bool wd_padding_generated;
 
 void wd_padding_generate(void);
 void wd_padding_check(WD_STD_PARAMS, wd_alloc *alloc);
+void wd_padding_write(wd_alloc *alloc);
+void wd_padding_clear(wd_alloc *alloc);
 
 #endif /* !WD_PADDING_H */

@@ -14,10 +14,12 @@ int main(void)
   printf("'%c'\n", a(3));
   a = realloc(a, 10);
   free(a);
+  (void)WD_ARRAY(a, 0);
+  
   // assert(1==2);
   // raise(SIGFPE);
   // raise(SIGSEGV);
-  raise(SIGILL);
+  // raise(SIGILL);
   
   printf("--- Summary:\n");
 }

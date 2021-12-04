@@ -1,6 +1,6 @@
 /*
 snapshots.h - watchdog
-Modified 2021-12-02
+Modified 2021-12-04
 */
 
 #ifndef WD_SNAPSHOTS_H
@@ -8,11 +8,14 @@ Modified 2021-12-02
 
 /* Header-specific includes. */
 #include "dogshed.h"
+#include "radar.h"
 
 /*
 *** Snapshots interface.
 */
 
+void wd_snapshot_alloc(wd_alloc *alloc);
+void wd_snapshot_realloc(wd_alloc *alloc);
 void wd_snapshot_take(wd_alloc *alloc);
 void wd_snapshot_check(WD_STD_PARAMS, wd_alloc *alloc);
 

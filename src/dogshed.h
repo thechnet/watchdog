@@ -18,7 +18,8 @@ Modified 2021-12-04
 *** Constants.
 */
 
-#define WD_MSG_OUT_OF_MEMORY "Out of memory."
+#define WD_MSG_OUT_OF_MEMORY "Out of memory – Wanted %zu(+%zu) b."
+#define WD_MSG_OUT_OF_MEMORY_INTERNAL "(Internal) Out of memory – Wanted %zu+%zu b."
 #define WD_MSG_UNTRACKED_MEMORY "Untracked memory."
 #define WD_MSG_NOT_FREED "Memory not freed."
 #define WD_MSG_ALL_FREED "All memory freed."
@@ -34,6 +35,8 @@ Modified 2021-12-04
 #define WD_MSG_SIGFPE "Arithmetic error."
 #define WD_MSG_SIGILL "Illegal instruction."
 #define WD_MSG_SIGSEGV "Segmentation fault."
+#define WD_MSG_INCOMING_DANGLING "Incoming dangling pointer (freed at " LOGGING_WHERE ")."
+#define WD_MSG_ASSERT "Assertion failed: %s"
 
 #define WD_STD_PARAMS char *file, size_t line
 #define WD_STD_PARAMS_PASS file, line
@@ -47,14 +50,6 @@ typedef struct _wd_point {
   char *file;
   int line;
 } wd_point;
-
-typedef struct _wd_alloc {
-  wd_point origin;
-  void *memory;
-  size_t size;
-  bool check_padding;
-  void *snapshot;
-} wd_alloc;
 
 /*
 *** Globals.
@@ -76,5 +71,11 @@ void wd_unleash(WD_STD_PARAMS);
 #define WD_ENSURE_UNLEASHED() \
   if (!wd_unleashed) \
     wd_unleash(WD_STD_PARAMS_PASS);
+
+#define WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(allocator_return_value, alloc_size, size_markup)\
+  if (allocator_return_value == NULL) {\
+    wd_alerts++;\
+    fail_at(WD_STD_ARGS, WD_MSG_OUT_OF_MEMORY_INTERNAL, alloc_size, size_markup);\
+  }
 
 #endif

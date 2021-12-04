@@ -1,6 +1,6 @@
 /*
 dangling.c - watchdog
-Modified 2021-12-03
+Modified 2021-12-04
 */
 
 /* Header-specific includes. */
@@ -13,7 +13,7 @@ Modified 2021-12-03
 *** Dangling globals.
 */
 
-void **wd_dangling = NULL;
+wd_dangling_pointer *wd_dangling = NULL;
 size_t wd_dangling_size = 0;
 
 /*
@@ -65,15 +65,15 @@ void wd_dangling_grow(WD_STD_PARAMS)
 /*
 Find an address in the dangling pointer record.
 */
-void **wd_dangling_find(WD_STD_PARAMS, void *address)
+wd_dangling_pointer *wd_dangling_find(WD_STD_PARAMS, void *address)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
   assert(wd_dangling != NULL);
   
-  void **pointer;
+  wd_dangling_pointer *pointer;
   for (pointer=wd_dangling; pointer<wd_dangling+wd_dangling_size; pointer++)
-    if (*pointer == address)
+    if (pointer->address == address)
       break;
   
   assert(pointer <= wd_dangling+wd_dangling_size);
@@ -96,17 +96,48 @@ void wd_dangling_record(WD_STD_PARAMS, void *address)
   /* Assert that this function runs in the right circumstances. */
   assert(wd_dangling != NULL);
   
-  void **pointer = wd_dangling_find(WD_STD_PARAMS_PASS, WD_DANGLING_EMPTY_SPOT);
-  *pointer = address;
+  wd_dangling_pointer *pointer = wd_dangling_find(WD_STD_PARAMS_PASS, WD_DANGLING_EMPTY_SPOT);
+  *pointer = (wd_dangling_pointer){
+    .address = address,
+    .freed_at = (wd_point){
+      .file = file,
+      .line = line
+    }
+  };
 }
 
 /*
 Erase an address from the record of dangling pointers.
 */
-void wd_dangling_erase(void **pointer)
+void wd_dangling_erase(wd_dangling_pointer *pointer)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_dangling != NULL);
   
-  *pointer = NULL;
+  *pointer = (wd_dangling_pointer){
+    .address = NULL,
+    .freed_at = (wd_point){
+      .file = NULL,
+      .line = 0
+    }
+  };
+}
+
+/*
+If present, erase an address from the record of dangling pointers.
+*/
+bool wd_dangling_find_and_erase(void *address)
+{
+  /* Assert that this function runs in the right circumstances. */
+  assert(wd_dangling != NULL);
+  assert(address != NULL);
+  
+  /* Search the address in the record. */
+  wd_dangling_pointer *pointer = wd_dangling_find(WD_STD_ARGS, address);
+  
+  /* If found, erase the address from the record. */
+  if (pointer == NULL)
+    return false;
+  wd_dangling_erase(pointer);
+  return true;
 }
