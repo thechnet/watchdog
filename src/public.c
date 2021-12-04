@@ -1,6 +1,6 @@
 /*
 public.c - watchdog
-Modified 2021-12-03
+Modified 2021-12-04
 */
 
 /* Header-specific includes. */
@@ -15,6 +15,7 @@ Modified 2021-12-03
 #include "snapshots.h"
 #include "dangling.h"
 #include "usage.h"
+#include "signals.h"
 
 /*
 *** Globals.
@@ -54,6 +55,7 @@ void wd_unleash(WD_STD_PARAMS)
   wd_tracks_reset();
   wd_dangling_open();
   wd_usage_reset();
+  wd_signals_register();
   
   if (atexit(wd_restrain) != 0) {
     wd_alerts++;

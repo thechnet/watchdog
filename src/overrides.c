@@ -1,6 +1,6 @@
 /*
 overrides.c - watchdog
-Modified 2021-12-03
+Modified 2021-12-04
 */
 
 /* Header-specific includes. */
@@ -8,6 +8,7 @@ Modified 2021-12-03
 
 /* Implementation-specific includes. */
 #include <memory.h>
+#include "dogshed.h"
 #include "radar.h"
 #include "reporter.h"
 #include "public.h"
@@ -149,4 +150,14 @@ void wd_override_free(WD_STD_PARAMS, void *memory)
   /* Warn if freeing untracked memory. */
   if (!wd_radar_drop(WD_STD_ARGS, memory))
     warn_at(WD_STD_PARAMS_PASS, WD_MSG_UNTRACKED_MEMORY " (%p)", memory);
+}
+
+/*
+Override assert.
+*/
+void wd_override_assert(WD_STD_PARAMS, char *assertion_string, int assertion)
+{
+  if (assertion)
+    return;
+  fail_at(file, line, "Assertion failed: %s", assertion_string); // FIXME: MSG
 }

@@ -2,20 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <assert.h>
+#include <signal.h>
 #include "watchdog.h"
 
 int main(void)
 {
-  int b[4] = {1,2,3,4};
-  printf("%zu, %zu, %zu, %zu\n",
-    sizeof(b), sizeof(b[0]),
-    sizeof(b+2), sizeof((b+1)[0])
-  );
-  
   char *a = malloc(5*sizeof(*a));
-  strcpy(a, "abcdefdsf");
+  strcpy(a, "abcd");
+  #define a(i) WD_ARRAY(a, i)
+  printf("'%c'\n", a(3));
   a = realloc(a, 10);
   free(a);
+  // assert(1==2);
+  // raise(SIGFPE);
+  // raise(SIGSEGV);
+  raise(SIGILL);
   
   printf("--- Summary:\n");
 }

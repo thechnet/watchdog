@@ -25,6 +25,7 @@ Status|Work|Notes
 🏃|Dangling (track dangling pointers)|
 🏃|Usage (calculate real memory usage)|
 🏃|Manual bounds protection|
+🏃|Signals|Signal interception|
 
 ## Source Overview
 
@@ -64,6 +65,10 @@ Keeps a copy of the initial data at a memory location to calculate the actual me
 
 Contains function overrides.
 
-### `public.c`
+### `bounds`
+
+Manual bounds protection.
+
+### `public`
 
 Defines general public functions such as the initializer.

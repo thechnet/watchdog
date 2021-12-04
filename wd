@@ -7,6 +7,8 @@ src/dangling.c
 src/usage.c
 src/overrides.c
 src/public.c
+src/bounds.c
+src/signals.c
 
 test.c
 
