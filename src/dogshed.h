@@ -1,6 +1,6 @@
 /*
 dogshed.h - watchdog
-Modified 2021-12-04
+Modified 2021-12-05
 */
 
 #ifndef WD_DOGSHED_H
@@ -24,24 +24,24 @@ Modified 2021-12-04
 #define WD_STD_ARGS __FILE__, __LINE__
 
 #define WD_MSG_OUT_OF_MEMORY "Out of memory – Wanted %zu(+%zu) b."
-#define WD_MSG_OUT_OF_MEMORY_INTERNAL "(Internal) Out of memory – Wanted %zu+%zu b."
-#define WD_MSG_UNTRACKED_MEMORY "Untracked memory."
+#define WD_MSG_OUT_OF_MEMORY_INTERNAL "(Out of memory – Wanted %zu+%zu b.)"
+#define WD_MSG_INCOMING_UNTRACKED "Incoming memory is untracked."
+#define WD_MSG_INCOMING_NULL "Incoming NULL pointer."
+#define WD_MSG_INCOMING_DANGLING "Incoming dangling pointer (freed at " LOGGING_WHERE ")."
 #define WD_MSG_NOT_FREED "Memory not freed."
 #define WD_MSG_ALL_FREED "All memory freed."
-#define WD_MSG_ATEXIT "atexit failed. Call wd_restrain manually."
+#define WD_MSG_ATEXIT "(ATEXIT failed. Call wd_restrain manually.)"
+#define WD_MSG_SIGNAL "(SIGNAL failed. Not catching signals.)"
 #define WD_MSG_SIZE_0 "Size is 0."
-#define WD_MSG_INCOMING_NULL "Incoming NULL pointer."
-#define WD_MSG_REALLOC_SIZE "Size smaller or same."
-#define WD_MSG_TRACK "Tracks."
+#define WD_MSG_SIZE_NOT_BIGGER "Size smaller or same."
 #define WD_MSG_PADDING_LEFT "Left padding not intact at " LOGGING_WHERE "."
 #define WD_MSG_PADDING_RIGHT "Right padding not intact at " LOGGING_WHERE "."
-#define WD_MSG_SNAPSHOT "Snapshot changed at " LOGGING_WHERE "."
-#define WD_MSG_OUT_OF_BOUNDS "Index out of range. (%d of #%zu)"
-#define WD_MSG_SIGNAL "signal failed. Not catching signals."
 #define WD_MSG_SIGFPE "Arithmetic error."
 #define WD_MSG_SIGILL "Illegal instruction."
 #define WD_MSG_SIGSEGV "Segmentation fault."
-#define WD_MSG_INCOMING_DANGLING "Incoming dangling pointer (freed at " LOGGING_WHERE ")."
+#define WD_MSG_OUT_OF_BOUNDS "Index out of range. (%d of #%zu)"
+#define WD_MSG_TRACK "Tracks."
+#define WD_MSG_SNAPSHOT "Snapshot of " LOGGING_WHERE " changed unexpectedly."
 #define WD_MSG_ASSERT "Assertion failed: %s"
 
 /*

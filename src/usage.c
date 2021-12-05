@@ -1,6 +1,6 @@
 /*
 usage.c - watchdog
-Modified 2021-12-04
+Modified 2021-12-05
 */
 
 /* Header-specific includes. */
@@ -73,14 +73,16 @@ void wd_usage_original_capture(wd_alloc *alloc)
 /*
 Update the original memory after reallocation.
 */
-void wd_usage_original_update(wd_alloc *alloc, size_t old_size)
+void wd_usage_original_update(wd_alloc *alloc, int growth) /* FIXME: Change type? */
 {
   assert(alloc != NULL);
   assert(alloc->original != NULL);
   alloc->original = realloc(alloc->original, alloc->size);
   WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->original, alloc->size, 0);
-  if (alloc->size > old_size)
-    memcpy(alloc->original+old_size, alloc->address+old_size, alloc->size-old_size);
+  if (growth <= 0)
+    return;
+  size_t size_before = alloc->size-growth;
+  memcpy(alloc->original+size_before, alloc->address+size_before, growth);
 }
 
 /*
@@ -91,6 +93,7 @@ void wd_usage_original_compare(wd_alloc *alloc)
   assert(alloc != NULL);
   size_t bytes_unchanged = 0;
   size_t bytes_changed = 0;
+  assert(alloc->original != NULL);
   for (size_t i=0; i<alloc->size; i++)
     if (alloc->address[0] == alloc->original[0])
       bytes_unchanged++;

@@ -1,6 +1,6 @@
 /*
 usage.h - watchdog
-Modified 2021-12-04
+Modified 2021-12-05
 */
 
 #ifndef WD_USAGE_H
@@ -29,7 +29,7 @@ void wd_usage_reset(void);
 void wd_usage_add(size_t amount);
 void wd_usage_subtract(size_t amount);
 void wd_usage_original_capture(wd_alloc *alloc);
-void wd_usage_original_update(wd_alloc *alloc, size_t old_size);
+void wd_usage_original_update(wd_alloc *alloc, int growth);
 void wd_usage_original_compare(wd_alloc *alloc);
 
 #endif /* !WD_USAGE_H */

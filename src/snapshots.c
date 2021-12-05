@@ -1,6 +1,6 @@
 /*
 snapshots.c - watchdog
-Modified 2021-12-04
+Modified 2021-12-05
 */
 
 /* Header-specific includes. */
@@ -48,7 +48,7 @@ void wd_snapshot_compare(WD_STD_PARAMS, wd_alloc *alloc)
   assert(alloc->snapshot != NULL);
   
   if (memcmp(alloc->address, alloc->snapshot, alloc->size) != 0) {
-    warn_at(alloc->point.file, alloc->point.line, WD_MSG_SNAPSHOT, WD_STD_PARAMS_PASS);
+    warn_at(file, line, WD_MSG_SNAPSHOT, alloc->point.file, alloc->point.line);
     wd_snapshot_capture(alloc);
   }
 }

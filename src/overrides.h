@@ -1,6 +1,6 @@
 /*
 overrides.h - watchdog
-Modified 2021-12-04
+Modified 2021-12-05
 */
 
 #ifndef WD_OVERRIDES_H
@@ -27,7 +27,7 @@ Modified 2021-12-04
   {\
     if (size_now <= size_before) {\
       wd_alerts++;\
-      warn_at(file, line, WD_MSG_REALLOC_SIZE);\
+      warn_at(file, line, WD_MSG_SIZE_NOT_BIGGER);\
     }\
   }
   
@@ -60,7 +60,7 @@ Modified 2021-12-04
   {\
     if (radar_search__response == NULL) {\
       wd_alerts++;\
-      fail_at(file, line, WD_MSG_UNTRACKED_MEMORY);\
+      warn_at(file, line, WD_MSG_INCOMING_UNTRACKED);\
     }\
   }\
 
@@ -70,7 +70,7 @@ Modified 2021-12-04
 
 char *wd_override_malloc(char *file, size_t line, size_t size);
 // char *wd_override_calloc(char *file, size_t line, size_t count, size_t size);
-char *wd_override_realloc(char *file, size_t line, char *memory, size_t new_size);
+char *wd_override_realloc(char *file, size_t line, char *memory_virtual, size_t size_virtual_new);
 void wd_override_free(char *file, size_t line, char *memory);
 void wd_override_assert(char *file, size_t line, char *assertion_string, int assertion);
 

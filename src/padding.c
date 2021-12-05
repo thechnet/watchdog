@@ -1,6 +1,6 @@
 /*
 padding.c - watchdog
-Modified 2021-12-04
+Modified 2021-12-05
 */
 
 /* Header-specific includes. */
@@ -80,6 +80,7 @@ Clear padding from the end of an allocation.
 */
 void wd_padding_clear(wd_alloc *alloc)
 {
+  assert(wd_padding_generated);
   memset(alloc->address-WD_PADDING_SIZE, WD_PADDING_CLEAR_CHAR, WD_PADDING_SIZE);
   memset(alloc->address+alloc->size, WD_PADDING_CLEAR_CHAR, WD_PADDING_SIZE);
 }

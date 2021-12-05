@@ -87,6 +87,8 @@ Modified 2021-07-17
   out(__LOGGING_PRIS "=%lld", __LOGGING_WIDE #int_, (long long)int_)
 #define outf(float_)\
   out(__LOGGING_PRIS "=%f", __LOGGING_WIDE #float_, (double)float_)
+#define outp(ptr_)\
+  out(__LOGGING_PRIS "=%p", __LOGGING_WIDE #ptr_, ptr_)
 #define outc(c)\
   out(__LOGGING_PRIS "='%c'", __LOGGING_WIDE #c, c)
 #define outs(s)\

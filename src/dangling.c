@@ -1,6 +1,6 @@
 /*
 dangling.c - watchdog
-Modified 2021-12-04
+Modified 2021-12-05
 */
 
 /* Header-specific includes. */
@@ -20,6 +20,8 @@ size_t wd_dangling_size = 0;
 *** Dangling interface.
 */
 
+// FIXME: REFACTOR ALL OF THIS, SEE RADAR REFACTOR
+
 /*
 Open the dangling pointer record.
 */
@@ -32,6 +34,10 @@ void wd_dangling_open(void)
     wd_alerts++;
     fail_at(WD_STD_ARGS, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", sizeof(*wd_dangling)*wd_dangling_size);
   }
+  
+  /* Clear spots. */
+  for (size_t i=0; i<wd_dangling_size; i++)
+    wd_dangling_clear(wd_dangling+i);
 }
 
 /*
@@ -40,8 +46,9 @@ Close the dangling pointer record.
 void wd_dangling_close(void)
 {
   assert(wd_dangling != NULL);
-  wd_dangling_size = 0;
+  
   free(wd_dangling);
+  wd_dangling_size = 0;
 }
 
 /*
@@ -60,6 +67,10 @@ void wd_dangling_grow(WD_STD_PARAMS)
     wd_alerts++;
     fail_at(file, line, WD_MSG_OUT_OF_MEMORY " (malloc %zu b)", wd_dangling_size*sizeof(*wd_dangling));
   }
+  
+  /* Initialize new spots. */
+  for (size_t i=wd_dangling_size/2; i<wd_dangling_size; i++)
+    wd_dangling_clear(wd_dangling+i);
 }
 
 /*
@@ -109,7 +120,7 @@ void wd_dangling_record(WD_STD_PARAMS, char *address)
 /*
 Erase an address from the record of dangling pointers.
 */
-void wd_dangling_erase(wd_dangling_pointer *pointer)
+void wd_dangling_clear(wd_dangling_pointer *pointer)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_dangling != NULL);
@@ -126,7 +137,7 @@ void wd_dangling_erase(wd_dangling_pointer *pointer)
 /*
 If present, erase an address from the record of dangling pointers.
 */
-bool wd_dangling_find_and_erase(char *address)
+bool wd_dangling_find_and_clear(char *address)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_dangling != NULL);
@@ -138,6 +149,6 @@ bool wd_dangling_find_and_erase(char *address)
   /* If found, erase the address from the record. */
   if (pointer == NULL)
     return false;
-  wd_dangling_erase(pointer);
+  wd_dangling_clear(pointer);
   return true;
 }

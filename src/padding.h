@@ -1,6 +1,6 @@
 /*
 padding.h - watchdog
-Modified 2021-12-04
+Modified 2021-12-05
 */
 
 #ifndef WD_PADDING_H
@@ -28,8 +28,10 @@ extern bool wd_padding_generated;
 *** Padding preprocessor functions.
 */
 
+// FIXME: Fix the naming of these.
 #define WD_TO_REAL(address_virtual) (address_virtual-WD_PADDING_SIZE)
 #define WD_TO_VIRTUAL(address_real) (address_real+WD_PADDING_SIZE)
+#define WD_REAL_SIZE(size_virtual) (WD_PADDING_SIZE+size_virtual+WD_PADDING_SIZE)
 
 /*
 *** Padding interface.

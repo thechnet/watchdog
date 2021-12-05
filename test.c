@@ -4,17 +4,28 @@
 #include <assert.h>
 #include <signal.h>
 #include "watchdog.h"
+#define LOGGING_ID "#####"
+#include "logging/logging.h"
 
 int main(void)
 {
-  char *a = malloc(500*sizeof(*a));
-  a[0] = 'a';
-  // strcpy(a-1, "abc");
-  #define a(i) WD_ARRAY(a, i)
-  (void)a(3);
-  a = realloc(a, 10);
+  char *a = malloc(4*sizeof(*a));
+  char *b = strdup("abc");
+  b = realloc(b, 100);
   free(a);
-  (void)WD_ARRAY(a, 0);
+  free(b);
+  
+  // char *_ = "abc";
+  // char *a = strdup(_);
+  // assert(_!=a);
+  // a = realloc(a, 100);
+  // free(a);
+  
+  // a[0] = 'a';
+  // #define a(i) WD_ARRAY(a, i)
+  // (void)a(3);
+  // free(a);
+  // (void)WD_ARRAY(a, 0);
   
   // assert(1==2);
   // raise(SIGFPE);
