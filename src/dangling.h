@@ -1,6 +1,6 @@
 /*
 dangling.h - watchdog
-Modified 2021-12-05
+Modified 2021-12-08
 */
 
 #ifndef WD_DANGLING_H
@@ -38,9 +38,10 @@ extern wd_dangling_pointer *wd_dangling;
 
 void wd_dangling_open(void);
 void wd_dangling_close(void);
-wd_dangling_pointer *wd_dangling_find(WD_STD_PARAMS, char *address);
 void wd_dangling_record(WD_STD_PARAMS, char *address);
 void wd_dangling_clear(wd_dangling_pointer *pointer);
+wd_dangling_pointer *wd_dangling_search(char *address);
+wd_dangling_pointer *wd_dangling_find_next_free_spot(void);
 bool wd_dangling_find_and_clear(char *address);
 
 #endif /* !WD_DANGLING_H */

@@ -1,6 +1,6 @@
 /*
 radar.h - watchdog
-Modified 2021-12-05
+Modified 2021-12-08
 */
 
 #ifndef WD_RADAR_H
@@ -52,6 +52,7 @@ wd_alloc *wd_radar_add(WD_STD_PARAMS,
 );
 void wd_radar_drop(wd_alloc *alloc);
 void wd_radar_clear(wd_alloc *alloc);
+wd_alloc *wd_radar_find_next_free_spot(void);
 wd_alloc *wd_radar_search(char *memory);
 size_t wd_radar_real_size_get(wd_alloc *alloc);
 char *wd_radar_real_address_get(wd_alloc *alloc);

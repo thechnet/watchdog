@@ -1,6 +1,6 @@
 /*
 overrides.c - watchdog
-Modified 2021-12-05
+Modified 2021-12-08
 */
 
 /* Header-specific includes. */
@@ -66,7 +66,7 @@ char *wd_override_realloc(WD_STD_PARAMS, char *memory_virtual, size_t size_virtu
   if (alloc == NULL)
     alloc = wd_radar_add(WD_STD_PARAMS_PASS,
       memory_virtual, 0,
-      false, true, false
+      false, false, false
     );
   WD_WARN_IF_SIZE_REDUCED(alloc->size, size_virtual_new);
   
@@ -78,6 +78,28 @@ char *wd_override_realloc(WD_STD_PARAMS, char *memory_virtual, size_t size_virtu
   size_t size_real = wd_radar_real_size_get(alloc);
   size_t size_new_real = size_real+(size_virtual_new-alloc->size);
   char *memory_new_real = realloc(memory_real, size_new_real);
+  
+  /* If the memory was previously not padded (because it was untracked), we can now add the padding. */
+  if (!alloc->is_padded) {
+    char *memory_new_real_padded = malloc(WD_PADDING_SIZE+size_new_real+WD_PADDING_SIZE);
+    WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(memory_new_real_padded, size_new_real, 2*WD_PADDING_SIZE);
+    memcpy(memory_new_real_padded+WD_PADDING_SIZE, memory_new_real, size_new_real);
+    free(memory_new_real);
+    memory_new_real = memory_new_real_padded;
+    alloc->is_padded = true;
+    alloc->padding_check_left = true;
+    alloc->padding_check_right = true;
+  }
+  
+  /* If there were previously no snapshots of this memory (because it was untracked), we can now take one. */
+  if (alloc->snapshot == NULL) {
+    wd_snapshot_alloc(alloc);
+    wd_snapshot_capture(alloc);
+  }
+  
+  /* Record old pointer as dangling pointer if the real pointer has changed. */
+  if (memory_new_real != memory_real)
+    wd_dangling_record(WD_STD_PARAMS_PASS, memory_real);
   
   /* Verify outgoing values. */
   WD_FAIL_IF_OUT_OF_MEMORY(memory_new_real, size_virtual_new, size_new_real-size_virtual_new);

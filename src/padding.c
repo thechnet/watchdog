@@ -1,6 +1,6 @@
 /*
 padding.c - watchdog
-Modified 2021-12-05
+Modified 2021-12-08
 */
 
 /* Header-specific includes. */
@@ -54,14 +54,14 @@ void wd_padding_check(WD_STD_PARAMS, wd_alloc *alloc)
   if (alloc->padding_check_left && memcmp(alloc->address-WD_PADDING_SIZE, wd_padding, WD_PADDING_SIZE) != 0) {
     alloc->padding_check_left = false;
     wd_alerts++;
-    warn_at(alloc->point.file, alloc->point.line, WD_MSG_PADDING_LEFT, WD_STD_PARAMS_PASS);
+    warn_at(file, line, WD_MSG_PADDING_LEFT, alloc->point.file, alloc->point.line);
   }
   
   /* Right. */
   if (alloc->padding_check_right && memcmp(alloc->address+alloc->size, wd_padding, WD_PADDING_SIZE) != 0) {
     alloc->padding_check_right = false;
     wd_alerts++;
-    warn_at(alloc->point.file, alloc->point.line, WD_MSG_PADDING_RIGHT, WD_STD_PARAMS_PASS);
+    warn_at(file, line, WD_MSG_PADDING_RIGHT, alloc->point.file, alloc->point.line);
   }
 }
 

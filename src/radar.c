@@ -1,6 +1,6 @@
 /*
 radar.c - watchdog
-Modified 2021-12-05
+Modified 2021-12-08
 */
 
 /* Header-specific includes. */
@@ -63,22 +63,10 @@ void wd_radar_disable(void)
 }
 
 /*
-Start tracking an address on the radar.
+Find the next free spot on the radar, or grow it.
 */
-wd_alloc *wd_radar_add(WD_STD_PARAMS,
-  char *memory_real,
-  size_t size_virtual,
-  bool add_padding,
-  bool take_snapshots,
-  bool capture_original
-)
+wd_alloc *wd_radar_find_next_free_spot(void)
 {
-  /* Assert that this function runs in the right circumstances. */
-  assert(wd_unleashed);
-  assert(wd_radar != NULL);
-  assert(memory_real != NULL);
-  
-  /* Find the next free spot. */
   wd_alloc *alloc = NULL;
   for (size_t i=0; i<wd_radar_size; i++)
     if (wd_radar[i].address == NULL)
@@ -98,6 +86,28 @@ wd_alloc *wd_radar_add(WD_STD_PARAMS,
     
     alloc = wd_radar+old_size;
   }
+  
+  return alloc;
+}
+
+/*
+Start tracking an address on the radar.
+*/
+wd_alloc *wd_radar_add(WD_STD_PARAMS,
+  char *memory_real,
+  size_t size_virtual,
+  bool add_padding,
+  bool take_snapshots,
+  bool capture_original
+)
+{
+  /* Assert that this function runs in the right circumstances. */
+  assert(wd_unleashed);
+  assert(wd_radar != NULL);
+  assert(memory_real != NULL);
+  
+  /* Find the next free spot. */
+  wd_alloc *alloc = wd_radar_find_next_free_spot();
   
   /* Convert real address to virtual address. */
   char *memory_virtual;
@@ -208,7 +218,10 @@ Retrieve the real address.
 char *wd_radar_real_address_get(wd_alloc *alloc)
 {
   assert(alloc != NULL);
-  return alloc->address-WD_PADDING_SIZE;
+  if (alloc->is_padded)
+    return alloc->address-WD_PADDING_SIZE;
+  else
+    return alloc->address;
 }
 
 /*

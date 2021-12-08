@@ -1,6 +1,6 @@
 /*
 reporter.c - watchdog
-Modified 2021-12-04
+Modified 2021-12-08
 */
 
 /* Header-specific includes. */
@@ -40,18 +40,19 @@ void wd_reporter_summary(void)
     }
   if (radar_empty)
     success(WD_MSG_ALL_FREED);
-  printf(
-    "usage_current_allocated: %zu b\n"
-    "usage_current_allocated_internal: %zu b\n"
-    "usage_max_allocated: %zu b\n"
-    "usage_max_internal_allocated: %zu b\n"
-    "usage_total_written: %zu b\n"
-    "usage_total_allocated: %zu b\n",
-    wd_usage_current_allocated,
-    wd_usage_current_allocated_internal,
-    wd_usage_max_allocated,
-    wd_usage_max_allocated_internal,
-    wd_usage_total_written,
-    wd_usage_total_allocated
-  );
+  
+  // printf(
+  //   "\nusage_current_allocated: %zu b\n"
+  //   "usage_current_allocated_internal: %zu b\n"
+  //   "usage_max_allocated: %zu b\n"
+  //   "usage_max_internal_allocated: %zu b\n"
+  //   "usage_total_written: %zu b\n"
+  //   "usage_total_allocated: %zu b\n",
+  //   wd_usage_current_allocated,
+  //   wd_usage_current_allocated_internal,
+  //   wd_usage_max_allocated,
+  //   wd_usage_max_allocated_internal,
+  //   wd_usage_total_written,
+  //   wd_usage_total_allocated
+  // );
 }

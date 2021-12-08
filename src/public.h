@@ -1,6 +1,6 @@
 /*
 dogshed.h - watchdog
-Modified 2021-12-02
+Modified 2021-12-08
 */
 
 #ifndef WD_PUBLIC_H
@@ -14,6 +14,6 @@ Modified 2021-12-02
 */
 
 void wd_restrain(void);
-int wd_bark(char *file, size_t line); // FIXME: Cannot use WD_STD_PARAMS because we do not want to expose that macro to the public.
+int wd_bark(char *file, size_t line);
 
 #endif

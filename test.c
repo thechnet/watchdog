@@ -9,11 +9,14 @@
 
 int main(void)
 {
+  char *abc = "abc";
   char *a = malloc(4*sizeof(*a));
-  char *b = strdup("abc");
-  b = realloc(b, 100);
-  free(a);
+  char *b = strdup(abc);
+  strcpy(b, "sdsdsd");
+  b = realloc(b, 50);
+  strcpy(b-1, "sdsdsd");
   free(b);
+  free(a);
   
   // char *_ = "abc";
   // char *a = strdup(_);

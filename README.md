@@ -19,7 +19,7 @@ Status|Work|Notes
 -|-|-
 🏃|Set up basic infrastructure.|Remove WD_STD_PARAMS for functions that do not need them. Ensure header inclusions make sense. Expose WD_STD_PARAMS? Replace integral types with (u)int64_t. Expose simplified wd_bark.
 ✅|Radar (track unfreed allocations)|Requires testing.
-🏃|Reporter (handle output of information)|Functionality of alerts still unclear.
+🏃|Reporter (handle output of information)|Functionality of alerts still unclear. Suppress upcoming warnings?
 ✅|Tracks (track control flow)|
 ✅|Padding (catch buffer overflows)|
 ✅|Snapshots (catch accidental memory modification)|

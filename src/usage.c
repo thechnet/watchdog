@@ -1,6 +1,6 @@
 /*
 usage.c - watchdog
-Modified 2021-12-05
+Modified 2021-12-08
 */
 
 /* Header-specific includes. */
@@ -54,7 +54,7 @@ Subtract amount from current memory usage.
 */
 void wd_usage_subtract(size_t amount)
 {
-  assert((int64_t)wd_usage_current_allocated - amount >= 0); // FIXME:?
+  assert((int64_t)wd_usage_current_allocated-amount >= 0); // FIXME:?
   wd_usage_current_allocated -= amount;
 }
 
@@ -73,7 +73,7 @@ void wd_usage_original_capture(wd_alloc *alloc)
 /*
 Update the original memory after reallocation.
 */
-void wd_usage_original_update(wd_alloc *alloc, int growth) /* FIXME: Change type? */
+void wd_usage_original_update(wd_alloc *alloc, int growth)
 {
   assert(alloc != NULL);
   assert(alloc->original != NULL);

@@ -1,6 +1,6 @@
 /*
 reporter.h - watchdog
-Modified 2021-12-01
+Modified 2021-12-08
 */
 
 #ifndef WD_REPORTER_H
@@ -13,7 +13,7 @@ Modified 2021-12-01
 *** Reporter globals.
 */
 
-extern size_t wd_alerts; // FIXME: Still unsure about the use of this.
+extern size_t wd_alerts;
 
 /*
 *** Reporter interface.

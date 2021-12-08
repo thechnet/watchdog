@@ -1,6 +1,6 @@
 /*
 dogshed.h - watchdog
-Modified 2021-12-05
+Modified 2021-12-08
 */
 
 #ifndef WD_DOGSHED_H
@@ -9,8 +9,9 @@ Modified 2021-12-05
 /* Header-specific includes. */
 #include <stdbool.h>
 #include <assert.h>
-#include "../logging/escseq.h" // FIXME: It is currently required to include escseq before logging
-                               // here to avoid defining the escape sequences as wide-character strings.
+#include "../logging/escseq.h" /* FIXME: It is currently required to include escseq before logging
+                                         here to avoid defining the escape sequences as
+                                         wide-character strings. */
 #define LOGGING_WIDE
 #define LOGGING_ID "watchdog"
 #include "../logging/logging.h"
@@ -34,14 +35,14 @@ Modified 2021-12-05
 #define WD_MSG_SIGNAL "(SIGNAL failed. Not catching signals.)"
 #define WD_MSG_SIZE_0 "Size is 0."
 #define WD_MSG_SIZE_NOT_BIGGER "Size smaller or same."
-#define WD_MSG_PADDING_LEFT "Left padding not intact at " LOGGING_WHERE "."
-#define WD_MSG_PADDING_RIGHT "Right padding not intact at " LOGGING_WHERE "."
+#define WD_MSG_PADDING_LEFT "Left padding of [" LOGGING_WHERE "] not intact."
+#define WD_MSG_PADDING_RIGHT "Right padding of [" LOGGING_WHERE "] not intact."
 #define WD_MSG_SIGFPE "Arithmetic error."
 #define WD_MSG_SIGILL "Illegal instruction."
 #define WD_MSG_SIGSEGV "Segmentation fault."
 #define WD_MSG_OUT_OF_BOUNDS "Index out of range. (%d of #%zu)"
 #define WD_MSG_TRACK "Tracks."
-#define WD_MSG_SNAPSHOT "Snapshot of " LOGGING_WHERE " changed unexpectedly."
+#define WD_MSG_SNAPSHOT "Snapshot of [" LOGGING_WHERE "] changed unexpectedly."
 #define WD_MSG_ASSERT "Assertion failed: %s"
 
 /*

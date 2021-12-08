@@ -1,6 +1,6 @@
 /*
 overrides.h - watchdog
-Modified 2021-12-05
+Modified 2021-12-08
 */
 
 #ifndef WD_OVERRIDES_H
@@ -11,10 +11,9 @@ Modified 2021-12-05
 #include <stdint.h>
 
 /*
-*** Overrides helpers.
+*** Overrides helpers. FIXME: Where do we put these? They are also needed in bounds.c.
 */
 
-// FIXME: Find solution to WD_STD_PARAMS_PASS.
 #define WD_WARN_IF_SIZE_0(size)\
   {\
     if (size == 0) {\
@@ -35,6 +34,14 @@ Modified 2021-12-05
   {\
     if (ptr == NULL) {\
       wd_alerts++;\
+      warn_at(file, line, WD_MSG_INCOMING_NULL);\
+    }\
+  }
+
+#define WD_FAIL_IF_PTR_NULL(ptr)\
+  {\
+    if (ptr == NULL) {\
+      wd_alerts++;\
       fail_at(file, line, WD_MSG_INCOMING_NULL);\
     }\
   }
@@ -49,7 +56,7 @@ Modified 2021-12-05
 
 #define WD_WARN_IF_PTR_DANGLING(ptr)\
   {\
-    wd_dangling_pointer *_ptr = wd_dangling_find(WD_STD_PARAMS_PASS, ptr);\
+    wd_dangling_pointer *_ptr = wd_dangling_search(ptr);\
     if (_ptr != NULL) {\
       wd_alerts++;\
       warn_at(file, line, WD_MSG_INCOMING_DANGLING, _ptr->freed_at.file, _ptr->freed_at.line);\
