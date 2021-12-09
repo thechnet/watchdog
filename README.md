@@ -27,6 +27,7 @@ Status|Work|Notes
 🏃|Usage (calculate real memory usage)|Track actual used memory [NOT WORKING YET]
 ✅|Manual bounds protection|
 ✅|Signals (Signal interception)|
+🏃|Ignored (addresses to ignore)|
 ❌|Rework logging header|Seperate project, add more customizable logging styles. Maybe improve escseq, too?
 
 ## Source Overview

@@ -1,6 +1,6 @@
 /*
 overrides.h - watchdog
-Modified 2021-12-08
+Modified 2021-12-09
 */
 
 #ifndef WD_OVERRIDES_H
@@ -63,11 +63,27 @@ Modified 2021-12-08
     }\
   }
 
-#define WD_WARN_IF_RADAR_FINDS_PTR_UNTRACKED(radar_search__response)\
+#define WD_WARN_IF_RADAR_FINDS_PTR_UNTRACKED(radar_search__response, id)\
   {\
     if (radar_search__response == NULL) {\
       wd_alerts++;\
-      warn_at(file, line, WD_MSG_INCOMING_UNTRACKED);\
+      warn_at(file, line, WD_MSG_INCOMING_UNTRACKED, id);\
+    }\
+  }\
+
+#define WD_FAIL_IF_RADAR_FINDS_PTR_ENCLOSED(radar_locate__response, id)\
+  {\
+    if (radar_locate__response != NULL) {\
+      wd_alerts++;\
+      fail_at(file, line, WD_MSG_INCOMING_ENCLOSED, id);\
+    }\
+  }\
+
+#define WD_INFO_IF_RADAR_FINDS_PTR_UNTRACKED(radar_search__response, id)\
+  {\
+    if (radar_search__response == NULL) {\
+      wd_alerts++;\
+      info_at(file, line, WD_MSG_INCOMING_UNTRACKED, id);\
     }\
   }\
 
@@ -75,10 +91,12 @@ Modified 2021-12-08
 *** Overrides.
 */
 
-char *wd_override_malloc(char *file, size_t line, size_t size);
+void *wd_override_malloc(char *file, size_t line, size_t size);
 // char *wd_override_calloc(char *file, size_t line, size_t count, size_t size);
-char *wd_override_realloc(char *file, size_t line, char *memory_virtual, size_t size_virtual_new);
+void *wd_override_realloc(char *file, size_t line, char *memory_virtual, size_t size_virtual_new);
 void wd_override_free(char *file, size_t line, char *memory);
 void wd_override_assert(char *file, size_t line, char *assertion_string, int assertion);
+char *wd_override_strcpy(char *file, size_t line, char *dest_user, char *src_user);
+char *wd_override_strdup(char *file, size_t line, char *src_user);
 
 #endif /* !WD_OVERRIDES_H */

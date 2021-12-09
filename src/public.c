@@ -1,6 +1,6 @@
 /*
 public.c - watchdog
-Modified 2021-12-04
+Modified 2021-12-09
 */
 
 /* Header-specific includes. */
@@ -73,7 +73,7 @@ int wd_bark(WD_STD_PARAMS)
   WD_ENSURE_UNLEASHED();
   
   for (size_t i=0; i<wd_radar_size; i++)
-    if (wd_radar[i].address != NULL) {
+    if (wd_radar[i].addr_user != NULL) {
       if (wd_radar[i].padding_check_left || wd_radar[i].padding_check_right)
         wd_padding_check(WD_STD_PARAMS_PASS, wd_radar+i);
       if (wd_radar[i].snapshot != NULL)
@@ -82,4 +82,17 @@ int wd_bark(WD_STD_PARAMS)
   
   wd_tracks_update(WD_STD_PARAMS_PASS);
   return 1;
+}
+
+/*
+Stop flagging an address as untracked.
+FIXME: Not sure if using .dependent for this is the right solution.
+Also, the entire implementation of this might need work.
+*/
+void wd_ignore(WD_STD_PARAMS, char *addr_user, size_t size_user)
+{
+  WD_ENSURE_UNLEASHED();
+  wd_bark(WD_STD_PARAMS_PASS);
+  
+  wd_radar_catch(NULL, 0, addr_user, size_user, false, false, true);
 }

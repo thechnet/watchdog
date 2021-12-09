@@ -1,6 +1,6 @@
 /*
 dogshed.h - watchdog
-Modified 2021-12-08
+Modified 2021-12-09
 */
 
 #ifndef WD_DOGSHED_H
@@ -26,7 +26,8 @@ Modified 2021-12-08
 
 #define WD_MSG_OUT_OF_MEMORY "Out of memory – Wanted %zu(+%zu) b."
 #define WD_MSG_OUT_OF_MEMORY_INTERNAL "(Out of memory – Wanted %zu+%zu b.)"
-#define WD_MSG_INCOMING_UNTRACKED "Incoming memory is untracked."
+#define WD_MSG_INCOMING_UNTRACKED "Incoming memory%s is untracked."
+#define WD_MSG_INCOMING_ENCLOSED "Incoming address%s is an offset into an allocation."
 #define WD_MSG_INCOMING_NULL "Incoming NULL pointer."
 #define WD_MSG_INCOMING_DANGLING "Incoming dangling pointer (freed at " LOGGING_WHERE ")."
 #define WD_MSG_NOT_FREED "Memory not freed."
@@ -42,7 +43,7 @@ Modified 2021-12-08
 #define WD_MSG_SIGSEGV "Segmentation fault."
 #define WD_MSG_OUT_OF_BOUNDS "Index out of range. (%d of #%zu)"
 #define WD_MSG_TRACK "Tracks."
-#define WD_MSG_SNAPSHOT "Snapshot of [" LOGGING_WHERE "] changed unexpectedly."
+#define WD_MSG_SNAPSHOT "Snapshot of [" LOGGING_WHERE "] changed without notice."
 #define WD_MSG_ASSERT "Assertion failed: %s"
 
 /*

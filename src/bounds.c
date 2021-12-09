@@ -1,6 +1,6 @@
 /*
 bounds.c - watchdog
-Modified 2021-12-08
+Modified 2021-12-09
 */
 
 /* Header-specific includes. */
@@ -49,7 +49,7 @@ int wd_bounds_check(WD_STD_PARAMS, char *array, size_t array_size, size_t item_s
   if (is_stack_array)
     items_count = array_size/item_size;
   else
-    items_count = alloc->size/item_size;
+    items_count = alloc->size_user/item_size;
   
   /* Fail if index out of bounds. */
   if (index < 0 || (size_t)index >= items_count) { // FIXME: Allow indices below 0?

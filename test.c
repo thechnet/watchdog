@@ -3,18 +3,26 @@
 #include <string.h>
 #include <assert.h>
 #include <signal.h>
+#include <wchar.h>
 #include "watchdog.h"
 #define LOGGING_ID "#####"
 #include "logging/logging.h"
 
 int main(void)
 {
+  // char *a = malloc(5);
+  // a = realloc(a, 10);
+  // free(a+1);
+  
   char *abc = "abc";
+  wd_ignore(__FILE__, __LINE__, abc, strlen(abc)+1);
+  char *def = "sdsdsd";
+  wd_ignore(__FILE__, __LINE__, def, strlen(def)+1);
   char *a = malloc(4*sizeof(*a));
-  char *b = strdup(abc);
-  strcpy(b, "sdsdsd");
+  char *b = strdup(abc+1);
+  strcpy(b, def);
   b = realloc(b, 50);
-  strcpy(b-1, "sdsdsd");
+  strcpy(b+1, def);
   free(b);
   free(a);
   

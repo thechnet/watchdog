@@ -1,6 +1,6 @@
 /*
 reporter.c - watchdog
-Modified 2021-12-08
+Modified 2021-12-09
 */
 
 /* Header-specific includes. */
@@ -33,7 +33,7 @@ void wd_reporter_summary(void)
   assert(wd_radar != NULL);
   bool radar_empty = true;
   for (size_t i=0; i<wd_radar_size; i++)
-    if (wd_radar[i].address != NULL) {
+    if (wd_radar[i].addr_user != NULL && !wd_radar[i].dependent) {
       radar_empty = false;
       wd_alerts++;
       warn_at(wd_radar[i].point.file, wd_radar[i].point.line, WD_MSG_NOT_FREED);

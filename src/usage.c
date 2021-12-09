@@ -1,6 +1,6 @@
 /*
 usage.c - watchdog
-Modified 2021-12-08
+Modified 2021-12-09
 */
 
 /* Header-specific includes. */
@@ -65,9 +65,9 @@ void wd_usage_original_capture(wd_alloc *alloc)
 {
   assert(alloc != NULL);
   assert(alloc->original == NULL);
-  alloc->original = malloc(alloc->size);
-  WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->original, alloc->size, 0);
-  memcpy(alloc->original, alloc->address, alloc->size);
+  alloc->original = malloc(alloc->size_user);
+  WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->original, 0, alloc->size_user);
+  memcpy(alloc->original, alloc->addr_user, alloc->size_user);
 }
 
 /*
@@ -76,13 +76,14 @@ Update the original memory after reallocation.
 void wd_usage_original_update(wd_alloc *alloc, int growth)
 {
   assert(alloc != NULL);
+  assert(alloc->is_native);
   assert(alloc->original != NULL);
-  alloc->original = realloc(alloc->original, alloc->size);
-  WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->original, alloc->size, 0);
+  alloc->original = realloc(alloc->original, alloc->size_user);
+  WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->original, 0, alloc->size_user);
   if (growth <= 0)
     return;
-  size_t size_before = alloc->size-growth;
-  memcpy(alloc->original+size_before, alloc->address+size_before, growth);
+  size_t size_before = alloc->size_user-growth;
+  memcpy(alloc->original+size_before, alloc->addr_user+size_before, growth);
 }
 
 /*
@@ -93,13 +94,14 @@ void wd_usage_original_compare(wd_alloc *alloc)
   assert(alloc != NULL);
   size_t bytes_unchanged = 0;
   size_t bytes_changed = 0;
+  assert(alloc->is_native);
   assert(alloc->original != NULL);
-  for (size_t i=0; i<alloc->size; i++)
-    if (alloc->address[0] == alloc->original[0])
+  for (size_t i=0; i<alloc->size_user; i++)
+    if (alloc->addr_user[0] == alloc->original[0])
       bytes_unchanged++;
     else
       bytes_changed++;
-  assert(bytes_unchanged+bytes_changed==alloc->size);
-  wd_usage_total_allocated += alloc->size;
+  assert(bytes_unchanged+bytes_changed==alloc->size_user);
+  wd_usage_total_allocated += alloc->size_user;
   wd_usage_total_written += bytes_changed;
 }

@@ -1,6 +1,6 @@
 /*
 radar.h - watchdog
-Modified 2021-12-08
+Modified 2021-12-09
 */
 
 #ifndef WD_RADAR_H
@@ -20,14 +20,18 @@ Modified 2021-12-08
 */
 
 typedef struct _wd_alloc {
-  wd_point point; /* The point of allocation or reallocation. */
-  size_t size; /* FIXME: Rename to size_virtual. */
-  char *address; /* FIXME: " */
+  wd_point point;
+  size_t size_user;
+  char *addr_user;
+  bool dependent;
+  
+  bool is_protected;
   char *snapshot;
-  char *original;
-  bool is_padded;
   bool padding_check_left;
   bool padding_check_right;
+  
+  bool is_native;
+  char *original;
 } wd_alloc;
 
 /*
@@ -43,21 +47,21 @@ extern size_t wd_radar_size;
 
 void wd_radar_enable(void);
 void wd_radar_disable(void);
-wd_alloc *wd_radar_add(WD_STD_PARAMS,
-  char *memory_real,
-  size_t size_virtual,
-  bool add_padding,
-  bool take_snapshots,
-  bool capture_original
-);
-void wd_radar_drop(wd_alloc *alloc);
-void wd_radar_clear(wd_alloc *alloc);
-wd_alloc *wd_radar_find_next_free_spot(void);
-wd_alloc *wd_radar_search(char *memory);
-size_t wd_radar_real_size_get(wd_alloc *alloc);
-char *wd_radar_real_address_get(wd_alloc *alloc);
-void wd_radar_virtual_address_set(wd_alloc *alloc, char *address_new_real);
+
+wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool protect, bool is_native, bool dependent);
 void wd_radar_unlock(wd_alloc *alloc);
-void wd_radar_lock(wd_alloc *alloc, size_t size_virtual_new, char *address_new_real);
+void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *migrated_real);
+void wd_radar_release(WD_STD_PARAMS, wd_alloc *alloc);
+
+void wd_radar_clear(wd_alloc *alloc);
+wd_alloc *wd_radar_find_spot(void);
+wd_alloc *wd_radar_search(char *addr_user);
+
+// FIXME: Is there a more elegant solution?
+size_t wd_radar_size_real_get(wd_alloc *alloc);
+char *wd_radar_addr_real_get(wd_alloc *alloc);
+void wd_radar_addr_user_set(wd_alloc *alloc, char *migrated_real);
+
+wd_alloc *wd_radar_locate(char *address);
 
 #endif
