@@ -7,8 +7,6 @@ Modified 2021-12-09
 #include "padding.h"
 
 /* Implementation-specific includes. */
-#include <time.h>
-#include <limits.h>
 #include <memory.h>
 #include "reporter.h"
 #include "radar.h"
@@ -29,9 +27,7 @@ Populate padding array.
 */
 void wd_padding_generate(void)
 {
-  srand(time(NULL));
-  for (int i=0; i<WD_PADDING_SIZE; i++)
-    wd_padding[i] = rand() % CHAR_MAX;
+  wd_fill_with_random_bytes(wd_padding, WD_PADDING_SIZE);
   wd_padding_generated = true;
 }
 

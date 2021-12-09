@@ -38,6 +38,7 @@ void wd_restrain(void)
   wd_reporter_summary();
   wd_radar_disable();
   wd_dangling_close();
+  wd_reporter_deinit();
   
   wd_unleashed = false;
 }
@@ -50,6 +51,7 @@ void wd_unleash(WD_STD_PARAMS)
   /* Assert that this function runs in the right circumstances. */
   assert(!wd_unleashed);
   
+  wd_reporter_init();
   wd_radar_enable();
   wd_padding_generate();
   wd_tracks_reset();
@@ -89,10 +91,10 @@ Stop flagging an address as untracked.
 FIXME: Not sure if using .dependent for this is the right solution.
 Also, the entire implementation of this might need work.
 */
-void wd_ignore(WD_STD_PARAMS, char *addr_user, size_t size_user)
+void wd_ignore(WD_STD_PARAMS, char *addr_user, ptrdiff_t size_user)
 {
   WD_ENSURE_UNLEASHED();
   wd_bark(WD_STD_PARAMS_PASS);
   
-  wd_radar_catch(NULL, 0, addr_user, size_user, false, false, true);
+  wd_radar_catch(NULL, 0, addr_user, size_user, false, false, true, false);
 }

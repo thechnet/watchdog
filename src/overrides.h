@@ -14,11 +14,11 @@ Modified 2021-12-09
 *** Overrides helpers. FIXME: Where do we put these? They are also needed in bounds.c.
 */
 
-#define WD_WARN_IF_SIZE_0(size)\
+#define WD_WARN_IF_SIZE_LEQ_0(size)\
   {\
-    if (size == 0) {\
+    if (size <= 0) {\
       wd_alerts++;\
-      warn_at(file, line, WD_MSG_SIZE_0);\
+      warn_at(file, line, WD_MSG_SIZE_LEQ_0);\
     }\
   }
 
@@ -50,7 +50,7 @@ Modified 2021-12-09
   {\
     if (allocator_return_value == NULL) {\
       wd_alerts++;\
-      fail_at(WD_STD_PARAMS_PASS, WD_MSG_OUT_OF_MEMORY, alloc_size, size_markup);\
+      fail_at(file, line, WD_MSG_OUT_OF_MEMORY, alloc_size, size_markup);\
     }\
   }
 
@@ -91,12 +91,11 @@ Modified 2021-12-09
 *** Overrides.
 */
 
-void *wd_override_malloc(char *file, size_t line, size_t size);
-// char *wd_override_calloc(char *file, size_t line, size_t count, size_t size);
-void *wd_override_realloc(char *file, size_t line, char *memory_virtual, size_t size_virtual_new);
-void wd_override_free(char *file, size_t line, char *memory);
-void wd_override_assert(char *file, size_t line, char *assertion_string, int assertion);
-char *wd_override_strcpy(char *file, size_t line, char *dest_user, char *src_user);
-char *wd_override_strdup(char *file, size_t line, char *src_user);
+void *wd_override_malloc(char *file, long line, ptrdiff_t size);
+void *wd_override_realloc(char *file, long line, char *addr_user, ptrdiff_t resize_user);
+void wd_override_free(char *file, long line, char *memory);
+void wd_override_assert(char *file, long line, char *assertion_string, int assertion);
+char *wd_override_strcpy(char *file, long line, char *dest_user, char *src_user);
+char *wd_override_strdup(char *file, long line, char *src_user);
 
 #endif /* !WD_OVERRIDES_H */

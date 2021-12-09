@@ -8,6 +8,7 @@ Modified 2021-12-09
 
 /* Implementation-specific includes. */
 #include <memory.h>
+#include <string.h>
 #include "dogshed.h"
 #include "radar.h"
 #include "reporter.h"
@@ -24,13 +25,13 @@ Modified 2021-12-09
 /*
 Override malloc.
 */
-void *wd_override_malloc(WD_STD_PARAMS, size_t size_user)
+void *wd_override_malloc(WD_STD_PARAMS, ptrdiff_t size_user)
 {
   WD_ENSURE_UNLEASHED();
   wd_bark(WD_STD_PARAMS_PASS);
   
   /* Verify incoming values. */
-  WD_WARN_IF_SIZE_0(size_user);
+  WD_WARN_IF_SIZE_LEQ_0(size_user);
   
   /* Allocate memory. */
   size_t size_real = WD_SIZE_USER_MAKE_REAL(size_user);
@@ -40,7 +41,7 @@ void *wd_override_malloc(WD_STD_PARAMS, size_t size_user)
   WD_FAIL_IF_OUT_OF_MEMORY(addr_real, size_user, WD_SIZE_REAL_MARKUP);
   
   /* Add new allocation to radar. */
-  wd_alloc *alloc = wd_radar_catch(WD_STD_PARAMS_PASS, addr_real, size_user, true, true, false);
+  wd_alloc *alloc = wd_radar_catch(WD_STD_PARAMS_PASS, addr_real, size_user, true, true, false, true);
   
   return (void*)alloc->addr_user;
 }
@@ -48,7 +49,7 @@ void *wd_override_malloc(WD_STD_PARAMS, size_t size_user)
 /*
 Override realloc.
 */
-void *wd_override_realloc(WD_STD_PARAMS, char *addr_user, size_t resize_user)
+void *wd_override_realloc(WD_STD_PARAMS, char *addr_user, ptrdiff_t resize_user)
 {
   WD_ENSURE_UNLEASHED();
   wd_bark(WD_STD_PARAMS_PASS);
@@ -56,7 +57,7 @@ void *wd_override_realloc(WD_STD_PARAMS, char *addr_user, size_t resize_user)
   /* Verify incoming values. */
   WD_WARN_IF_PTR_NULL(addr_user);
   WD_WARN_IF_PTR_DANGLING(addr_user);
-  WD_WARN_IF_SIZE_0(resize_user);
+  WD_WARN_IF_SIZE_LEQ_0(resize_user);
   wd_alloc *alloc = wd_radar_search(addr_user);
   
   /* If the incoming address is untracked, attempt to locate its surrounding allocation. */
@@ -68,7 +69,7 @@ void *wd_override_realloc(WD_STD_PARAMS, char *addr_user, size_t resize_user)
   WD_WARN_IF_RADAR_FINDS_PTR_UNTRACKED(alloc, "");
   /* ... and start tracking the new address. */
   if (alloc == NULL)
-    alloc = wd_radar_catch(WD_STD_PARAMS_PASS, addr_user, 0, false, false, false);
+    alloc = wd_radar_catch(WD_STD_PARAMS_PASS, addr_user, 0, false, false, false, false);
   
   WD_WARN_IF_SIZE_REDUCED(alloc->size_user, resize_user);
   
@@ -170,7 +171,7 @@ char *wd_override_strdup(WD_STD_PARAMS, char *src_user)
   strcpy(addr_user, src_user);
   
   /* Record on radar. */
-  wd_alloc *alloc = wd_radar_catch(WD_STD_PARAMS_PASS, addr_real, size_user, true, true, false);
+  wd_alloc *alloc = wd_radar_catch(WD_STD_PARAMS_PASS, addr_real, size_user, true, true, false, false);
   
   return alloc->addr_user;
 }

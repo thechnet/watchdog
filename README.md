@@ -2,76 +2,26 @@
 
 ## Introduction
 
-*Watchdog* will be a C library attempting to automatically warn developers of memory leaks, dangling pointers, buffer overflows, and accidental memory modifications present in their code. Additionally, the library will try to estimate the point of failure in case of segmentation faults and track the real memory usage versus the allocated amount of memory.
+*Watchdog* aims to become a C library that automatically warns developers of memory leaks, buffer overflows, memory corruption, and dangling pointers present in their code. Additionally, the library will narrow down the crash site on segmentation faults, compare the real memory usage to the allocated amount of memory, and offer manual bounds checking tools.
 
-One of the main design goals with this library is seamlessness. Therefore, all currently planned features will be enabled automatically by simply including the `watchdog.h` header. Also, as Watchdog will significantly impact your program's performance and greatly increase its memory usage, it is only intended to run in debug builds. 
-
-This project is built from scratch, but not without prior knowledge. I am basing a lot of its functionality on [`memdbg`](https://github.com/thechnet/une/blob/main/src/util/memdbg.c), a similar but less powerful module used during development of my interpreted programming language, [*Une*](https://github.com/thechnet/une).
+- One of the main design goals with this library is seamlessness. Therefore, most of its functionality is enabled automatically by simply including the `watchdog.h` header.
+- Watchdog significantly impacts your program's performance and greatly increases its memory usage. It should therefore only be enabled in debug builds.
+- This project is built from scratch, but not without prior knowledge. I am basing a lot of its functionality on [`memdbg`](https://github.com/thechnet/une/blob/main/src/util/memdbg.c), a similar but less powerful module used during development of my interpreted programming language, [*Une*](https://github.com/thechnet/une).
 
 ## Roadmap
 
-> ❌ Yet to start.  
-> 🏃 In progress...  
-> ✅ Finished.  
-> ✔️ Tested and working.  
-
-Status|Work|Notes
--|-|-
-🏃|Set up basic infrastructure.|Remove WD_STD_PARAMS for functions that do not need them. Ensure header inclusions make sense. Expose WD_STD_PARAMS? Replace integral types with (u)int64_t. Expose simplified wd_bark.
-✅|Radar (track unfreed allocations)|Requires testing.
-🏃|Reporter (handle output of information)|Functionality of alerts still unclear. Suppress upcoming warnings?
-✅|Tracks (track control flow)|
-✅|Padding (catch buffer overflows)|
-✅|Snapshots (catch accidental memory modification)|
-✅|Dangling (track dangling pointers)|
-🏃|Usage (calculate real memory usage)|Track actual used memory [NOT WORKING YET]
-✅|Manual bounds protection|
-✅|Signals (Signal interception)|
-🏃|Ignored (addresses to ignore)|
-❌|Rework logging header|Seperate project, add more customizable logging styles. Maybe improve escseq, too?
-
-## Source Overview
-
-### `dogshed.h`
-
-Contains general declarations used throughout the private aspect of the codebase.
-
-### `radar`
-
-Keeps track of unfreed allocations to warn the developer if they are not freeing memory.
-
-### `reporter`
-
-Continously prints status updates to an external file.
-
-### `tracks`
-
-Keeps track of the most recent position at which the program was executing successfully.
-
-### `padding`
-
-Handles allocation padding.
-
-### `snapshots`
-
-Keeps copies of memory between operations to catch accidental modifications.
-
-### `dangling`
-
-Keeps track of addresses that were previously freed, to warn the user if they are referencing a dangling pointer. Also sets freed pointers to `NULL` after deallocation to cause an immediate crash on use of a dangling pointer.
-
-### `usage`
-
-Keeps a copy of the initial data at a memory location to calculate the actual memory usage compared to the allocated amount.
-
-### `overrides`
-
-Contains function overrides.
-
-### `bounds`
-
-Manual bounds protection.
-
-### `public`
-
-Defines general public functions such as the initializer.
+Module|Description|Notes|Structure|Features|Stability
+-|-|-|-|-|-
+Radar|Find memory leaks.<br>`radar.c`, `radar.h`|<ul><li>Remove `.is_native`?</li><li>What do we do if an address is `locate`'d within the padding of an allocation?</li></ul>|🟠|🟢|🟠
+Tracks|Narrow down crash sites.<br>`tracks.c`, `tracks.h`|<ul><li>Rename to *Pulse*.</li></ul>|🟠|🟢|🟢
+Padding|Catch buffer overflows.<br>`padding.c`, `padding.h`|<ul></ul>|🟢|🟢|🟠
+Snapshots|Catch memory corruption.<br>`snapshots.c`, `snapshots.h`|<ul></ul>|🟠|🟢|🟠
+Dangling|Find dangling pointers.<br>`dangling.c`, `dangling.h`|<ul></ul>|🟠|🟢|🟠
+Usage|Profile memory usage.<br>`usage.c`, `usage.h`|<ul></ul>|🟠|🟠|🟠
+Bounds|Offer manual bounds checking.<br>`bounds.c`, `bounds.h`|<ul><li>Find a solution to the uncertainty when receiving untracked pointers.</li><li>Should we allow negative indices?</li></ul>|🟠|🟠|🟠
+Signals|Intercept signals.<br>`signals.c`, `signals.h`|<ul></ul>|🟢|🟢|🟠
+Overrides|Automatically inject watchdog into code.<br>`overrides.c`, `overrides.h`, `watchdog.h`|<ul><li>`fopen`, etc.</li><li>Override common functions like `strlen`?</li><li>Check for incoming string literals?</li></ul>|🟠|🟠|🟠
+*Ignored*|Manually ignore certain addresses, like constants, when checking for untracked addresses.|<ul></ul>|🔴|🟠|🔴
+Reporter|Handle output of information.<br>`reporter.c`, `reporter.h`|<ul><li>Allow users to suppress warnings.</li><li>Fix memory leaks after informing the user.</li><li>Highlight non-native allocations in messages.</li><li>Make it clear whether something happened *before* or *after* an overridden operation.</li></ul>|🟠|🟠|🟠
+Public Interface|Expose manual functionality to the user.<br>`public.c`, `public.h`|<ul></ul>|🟢|🟠|🟠
+Dogshed|Shared functionality and constants.<br>`dogshed.c`, `dogshed.h`|<ul><li>Distribute or collect constants? (e.g. messages, default sizes, etc.)</li></ul>|🟢|🟠|🟢

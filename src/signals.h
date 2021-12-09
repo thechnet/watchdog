@@ -1,6 +1,6 @@
 /*
 signals.h - watchdog
-Modified 2021-12-04
+Modified 2021-12-09
 */
 
 #ifndef WD_SIGNALS_H
@@ -15,6 +15,5 @@ Modified 2021-12-04
 
 void wd_signals_register(void);
 void wd_signals_handle(int signum);
-void wd_int_out(int num);
 
 #endif /* !WD_SIGNALS_H */

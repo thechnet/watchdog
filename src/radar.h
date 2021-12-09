@@ -48,7 +48,7 @@ extern size_t wd_radar_size;
 void wd_radar_enable(void);
 void wd_radar_disable(void);
 
-wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool protect, bool is_native, bool dependent);
+wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool protect, bool is_native, bool dependent, bool randomize_memory);
 void wd_radar_unlock(wd_alloc *alloc);
 void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *migrated_real);
 void wd_radar_release(WD_STD_PARAMS, wd_alloc *alloc);

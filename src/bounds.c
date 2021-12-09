@@ -21,7 +21,7 @@ Modified 2021-12-09
 /*
 Check bounds on an array.
 */
-int wd_bounds_check(WD_STD_PARAMS, char *array, size_t array_size, size_t item_size, int index)
+int wd_bounds_check(WD_STD_PARAMS, char *array, size_t array_size, size_t item_size, ptrdiff_t index)
 {
   /* Assert that this function runs in the right circumstances. */
   WD_FAIL_IF_PTR_NULL(array);
@@ -52,7 +52,7 @@ int wd_bounds_check(WD_STD_PARAMS, char *array, size_t array_size, size_t item_s
     items_count = alloc->size_user/item_size;
   
   /* Fail if index out of bounds. */
-  if (index < 0 || (size_t)index >= items_count) { // FIXME: Allow indices below 0?
+  if (index < 0 || index >= items_count) { // FIXME: Allow indices below 0?
     wd_alerts++;
     fail_at(__FILE__, __LINE__, WD_MSG_OUT_OF_BOUNDS, index, items_count);
   }

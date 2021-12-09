@@ -1,3 +1,4 @@
+src/dogshed.c
 src/radar.c
 src/reporter.c
 src/tracks.c

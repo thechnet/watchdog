@@ -14,7 +14,7 @@ Modified 2021-12-09
 */
 
 void wd_restrain(void);
-int wd_bark(char *file, size_t line);
-void wd_ignore(char *file, size_t line, char *addr_user, size_t size_user);
+int wd_bark(char *file, long line);
+void wd_ignore(char *file, long line, char *addr_user, ptrdiff_t size_user);
 
 #endif

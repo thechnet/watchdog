@@ -1,6 +1,6 @@
 /*
 signals.c - watchdog
-Modified 2021-12-04
+Modified 2021-12-09
 */
 
 /* Header-specific includes. */
@@ -9,13 +9,6 @@ Modified 2021-12-04
 /* Implementation-specific includes. */
 #include <string.h>
 #include <signal.h>
-#ifdef _WIN32
-#include <io.h>
-#define STDOUT_FILENO 1
-#define write(fd, buffer, count) _write(fd, buffer, count)
-#else
-#include <unistd.h>
-#endif
 #include "reporter.h"
 #include "tracks.h"
 
@@ -77,23 +70,4 @@ void wd_signals_handle(int signum)
   write(STDOUT_FILENO, eol, strlen(eol)+1);
   
   abort();
-}
-
-/*
-Write integer to stdout.
-*/
-void wd_int_out(int num)
-{
-  /* Get starting divisor. */
-  int divisor = 1;
-  for (int dividend=num; dividend>=10; dividend /= 10)
-    divisor *= 10;
-  
-  /* Write integer. */
-  while (divisor > 0) {
-    int quotient = num/divisor;
-    num -= quotient*divisor;
-    divisor /= 10;
-    write(STDOUT_FILENO, (char[1]){'0'+quotient}, 1);
-  }
 }

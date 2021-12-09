@@ -19,8 +19,8 @@ Modified 2021-12-02
 Overrides.
 */
 
-#define malloc(__size) wd_override_malloc(WD_STD_ARGS, (size_t)(__size))
-#define realloc(__memory, __new_size) wd_override_realloc(WD_STD_ARGS, (char*)(__memory), (size_t)(__new_size))
+#define malloc(__size) wd_override_malloc(WD_STD_ARGS, (ptrdiff_t)(__size))
+#define realloc(__memory, __new_size) wd_override_realloc(WD_STD_ARGS, (char*)(__memory), (ptrdiff_t)(__new_size))
 #define free(__memory) wd_override_free(WD_STD_ARGS, (char*)(__memory))
 #undef assert
 #define assert(__expression...) wd_override_assert(WD_STD_ARGS, #__expression, __expression)

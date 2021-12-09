@@ -12,3 +12,5 @@ __pycache__
 *.exe.stackdump
 *.ilk
 *.pdb
+
+watchdog.log

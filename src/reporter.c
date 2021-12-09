@@ -16,10 +16,40 @@ Modified 2021-12-09
 */
 
 size_t wd_alerts = 0;
+FILE *wd_reporter_log = NULL;
+size_t wd_reporter_log_count = 0;
 
 /*
 *** Reporter interface.
 */
+
+/*
+Initialize the reporter.
+*/
+void wd_reporter_init(void)
+{
+  #ifndef WD_REPORTER_ENABLE
+  return;
+  #endif
+  assert(wd_reporter_log == NULL);
+  wd_reporter_log_count = 0;
+  wd_reporter_log = fopen(WD_REPORTER_FILE_LOG, "w");
+  if (wd_reporter_log == NULL)
+    warn(WD_MSG_REPORTER_LOG);
+  wd_report("(Begin report.)");
+}
+
+/*
+Deinitialize the reporter.
+*/
+void wd_reporter_deinit(void)
+{
+  if (wd_reporter_log == NULL)
+    return;
+  wd_report("(End report.)");
+  fclose(wd_reporter_log);
+  wd_reporter_log = NULL;
+}
 
 /*
 Print a summary to the console.
@@ -41,18 +71,14 @@ void wd_reporter_summary(void)
   if (radar_empty)
     success(WD_MSG_ALL_FREED);
   
-  // printf(
-  //   "\nusage_current_allocated: %zu b\n"
-  //   "usage_current_allocated_internal: %zu b\n"
-  //   "usage_max_allocated: %zu b\n"
-  //   "usage_max_internal_allocated: %zu b\n"
-  //   "usage_total_written: %zu b\n"
-  //   "usage_total_allocated: %zu b\n",
-  //   wd_usage_current_allocated,
-  //   wd_usage_current_allocated_internal,
-  //   wd_usage_max_allocated,
-  //   wd_usage_max_allocated_internal,
-  //   wd_usage_total_written,
-  //   wd_usage_total_allocated
-  // );
+  printf(
+    "\nusage_current_allocated: %zu b\n"
+    "usage_max_allocated: %zu b\n"
+    "usage_total_written: %zu b\n"
+    "usage_total_allocated: %zu b\n",
+    wd_usage_current_allocated,
+    wd_usage_max_allocated,
+    wd_usage_total_written,
+    wd_usage_total_allocated
+  );
 }

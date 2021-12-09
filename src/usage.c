@@ -15,12 +15,10 @@ Modified 2021-12-09
 *** Usage globals.
 */
 
-size_t wd_usage_current_allocated;
-size_t wd_usage_current_allocated_internal;
-size_t wd_usage_max_allocated;
-size_t wd_usage_max_allocated_internal;
-size_t wd_usage_total_allocated;
-size_t wd_usage_total_written;
+ptrdiff_t wd_usage_current_allocated;
+ptrdiff_t wd_usage_max_allocated;
+ptrdiff_t wd_usage_total_allocated;
+ptrdiff_t wd_usage_total_written;
 
 /*
 *** Usage interface.
@@ -32,9 +30,7 @@ Reset usage metrics.
 void wd_usage_reset(void)
 {
   wd_usage_current_allocated = 0;
-  wd_usage_current_allocated_internal = 0;
   wd_usage_max_allocated = 0;
-  wd_usage_max_allocated_internal = 0;
   wd_usage_total_written = 0;
   wd_usage_total_allocated = 0;
 }
@@ -42,20 +38,12 @@ void wd_usage_reset(void)
 /*
 Add amount to current memory usage.
 */
-void wd_usage_add(size_t amount)
+void wd_usage_add(ptrdiff_t amount)
 {
+  assert(wd_usage_current_allocated+amount >= 0);
   wd_usage_current_allocated += amount;
   if (wd_usage_current_allocated > wd_usage_max_allocated)
     wd_usage_max_allocated = wd_usage_current_allocated;
-}
-
-/*
-Subtract amount from current memory usage.
-*/
-void wd_usage_subtract(size_t amount)
-{
-  assert((int64_t)wd_usage_current_allocated-amount >= 0); // FIXME:?
-  wd_usage_current_allocated -= amount;
 }
 
 /*
@@ -73,7 +61,7 @@ void wd_usage_original_capture(wd_alloc *alloc)
 /*
 Update the original memory after reallocation.
 */
-void wd_usage_original_update(wd_alloc *alloc, int growth)
+void wd_usage_original_update(wd_alloc *alloc, ptrdiff_t growth)
 {
   assert(alloc != NULL);
   assert(alloc->is_native);
@@ -82,7 +70,8 @@ void wd_usage_original_update(wd_alloc *alloc, int growth)
   WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->original, 0, alloc->size_user);
   if (growth <= 0)
     return;
-  size_t size_before = alloc->size_user-growth;
+  ptrdiff_t size_before = alloc->size_user-growth;
+  assert(size_before >= 0);
   memcpy(alloc->original+size_before, alloc->addr_user+size_before, growth);
 }
 
@@ -97,7 +86,7 @@ void wd_usage_original_compare(wd_alloc *alloc)
   assert(alloc->is_native);
   assert(alloc->original != NULL);
   for (size_t i=0; i<alloc->size_user; i++)
-    if (alloc->addr_user[0] == alloc->original[0])
+    if (alloc->addr_user[i] == alloc->original[i])
       bytes_unchanged++;
     else
       bytes_changed++;

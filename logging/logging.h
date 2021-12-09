@@ -37,6 +37,9 @@ Modified 2021-07-17
 #define LOGGING_WHERE __LOGGING_PRIHS ":%d"
 #define __LOGGING_WHERE LOGGING_WHERE ": "
 
+/* Miscellaneous */
+#define __LOGGING_STREAM stderr
+
 /* Message prefix. */
 #ifndef LOGGING_ID
 #define __LOGGING_ID ""
@@ -46,7 +49,7 @@ Modified 2021-07-17
 
 /* Helper macros. */
 #define __LOGGING_msg(style, msg) style __LOGGING_ID __LOGGING_WHERE msg "\33[0m\n"
-#define __LOGGING_out(msg, ...) __LOGGING_OUTFN(stderr, __LOGGING_WIDE msg, ##__VA_ARGS__)
+#define __LOGGING_out(msg, ...) __LOGGING_OUTFN(__LOGGING_STREAM, __LOGGING_WIDE msg, ##__VA_ARGS__)
 
 #define __LOGGING_logger(file, line, style, msg, ...)\
   __LOGGING_out(__LOGGING_msg(style, msg), file, line, ##__VA_ARGS__)

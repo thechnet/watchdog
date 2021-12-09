@@ -43,6 +43,8 @@ void wd_radar_enable(void)
   /* Zero the spots. */
   for (size_t i=0; i<wd_radar_size; i++)
     wd_radar_clear(wd_radar+i);
+  
+  wd_report("Radar: Enable");
 }
 
 /*
@@ -58,6 +60,8 @@ void wd_radar_disable(void)
   free(wd_radar);
   wd_radar = NULL;
   wd_radar_size = 0;
+  
+  wd_report("Radar: Disable");
 }
 
 /*
@@ -90,7 +94,7 @@ wd_alloc *wd_radar_find_spot(void)
 /*
 Start tracking an address on the radar.
 */
-wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool protect, bool is_native, bool dependent)
+wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool protect, bool is_native, bool dependent, bool randomize_memory)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -121,6 +125,10 @@ wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool 
     .original = NULL
   };
   
+  /* Randomize memory before capturing original. */
+  if (randomize_memory)
+    wd_fill_with_random_bytes(addr_user, size_user);
+  
   /* Protect. */
   if (alloc->is_protected) {
     /* Add padding. */
@@ -139,6 +147,11 @@ wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool 
   wd_dangling_pointer *pointer = wd_dangling_search(alloc->addr_user);
   if (pointer != NULL)
     wd_dangling_clear(pointer);
+  
+  /* Update usage. */
+  wd_usage_add(size_user);
+  
+  wd_report("Radar: Add %p (%zu)", alloc->addr_user, alloc->size_user);
   
   return alloc;
 }
@@ -170,6 +183,11 @@ void wd_radar_release(WD_STD_PARAMS, wd_alloc *alloc)
   
   /* Record address in dangling pointer record. */
   wd_dangling_record(WD_STD_PARAMS_PASS, alloc->addr_user);
+  
+  /* Update usage. */
+  wd_usage_add(-alloc->size_user);
+  
+  wd_report("Radar: Del %p", alloc->addr_user);
   
   /* Clear radar entry. */
   wd_radar_clear(alloc);
@@ -314,6 +332,11 @@ void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *mig
       wd_padding_write_left(alloc);
     wd_padding_write_right(alloc);
   }
+  
+  /* Randomize newly added memory. */
+  if (growth > 0)
+    wd_fill_with_random_bytes(alloc->addr_user+alloc->size_user-growth, growth);
+  
   /* Update snapshot. */
   if (alloc->snapshot != NULL) {
     wd_snapshot_realloc(alloc);
@@ -323,6 +346,11 @@ void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *mig
   /* Update original. */
   if (alloc->is_native)
     wd_usage_original_update(alloc, growth);
+  
+  /* Update usage. */
+  wd_usage_add(growth);
+  
+  wd_report("Radar: Mod %p", alloc->addr_user);
 }
 
 /*
