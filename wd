@@ -1,7 +1,7 @@
 src/dogshed.c
 src/radar.c
 src/reporter.c
-src/tracks.c
+src/pulse.c
 src/padding.c
 src/snapshots.c
 src/dangling.c

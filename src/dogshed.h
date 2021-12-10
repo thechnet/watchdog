@@ -1,6 +1,6 @@
 /*
 dogshed.h - watchdog
-Modified 2021-12-09
+Modified 2021-12-10
 */
 
 #ifndef WD_DOGSHED_H
@@ -49,7 +49,7 @@ Modified 2021-12-09
 #define WD_MSG_SIGILL "Illegal instruction."
 #define WD_MSG_SIGSEGV "Segmentation fault."
 #define WD_MSG_OUT_OF_BOUNDS "Index out of range. (%d of #%zu)"
-#define WD_MSG_TRACK "Tracks."
+#define WD_MSG_PULSE "(...) Last pulse at "
 #define WD_MSG_SNAPSHOT "Snapshot of [" LOGGING_WHERE "] changed without notice."
 #define WD_MSG_ASSERT "Assertion failed: %s"
 #define WD_MSG_REPORTER_LOG "(Unable to create log file. Not reporting.)"

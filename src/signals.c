@@ -1,6 +1,6 @@
 /*
 signals.c - watchdog
-Modified 2021-12-09
+Modified 2021-12-10
 */
 
 /* Header-specific includes. */
@@ -10,7 +10,7 @@ Modified 2021-12-09
 #include <string.h>
 #include <signal.h>
 #include "reporter.h"
-#include "tracks.h"
+#include "pulse.h"
 
 /*
 *** Signals interface.
@@ -59,13 +59,13 @@ void wd_signals_handle(int signum)
   #define eol RESET "\n"
   write(STDOUT_FILENO, eol, strlen(eol)+1);
   
-  /* Tracks. */
+  /* Pulse. */
   #undef prefix
-  #define prefix __LOGGING_STYLE_INFO __LOGGING_ID "(...) Last tracks at "
+  #define prefix __LOGGING_STYLE_INFO __LOGGING_ID WD_MSG_PULSE
   write(STDOUT_FILENO, prefix, strlen(prefix)+1);
-  write(STDOUT_FILENO, wd_track.file, strlen(wd_track.file)+1);
+  write(STDOUT_FILENO, wd_pulse.file, strlen(wd_pulse.file)+1);
   write(STDOUT_FILENO, (char[1]){':'}, 1);
-  wd_int_out(wd_track.line);
+  wd_int_out(wd_pulse.line);
   write(STDOUT_FILENO, (char[1]){'.'}, 1);
   write(STDOUT_FILENO, eol, strlen(eol)+1);
   

@@ -12,8 +12,8 @@
 
 Module|Description|Notes|Structure|Features|Stability
 -|-|-|-|-|-
-Radar|Find memory leaks.<br>`radar.c`, `radar.h`|<ul><li>Remove `.is_native`?</li><li>What do we do if an address is `locate`'d within the padding of an allocation?</li></ul>|🟠|🟢|🟠
-Tracks|Narrow down crash sites.<br>`tracks.c`, `tracks.h`|<ul><li>Rename to *Pulse*.</li></ul>|🟠|🟢|🟢
+Radar|Find memory leaks.<br>`radar.c`, `radar.h`|<ul><li>Remove `.is_native`?</li><li>What do we do if an address is `locate`'d within the padding of an allocation?</li><li>Fix memory leaks after informing the user?</li></ul>|🟠|🟢|🟠
+Pulse|Narrow down crash sites.<br>`pulse.c`, `pulse.h`|<ul></ul>|🟢|🟢|🟢
 Padding|Catch buffer overflows.<br>`padding.c`, `padding.h`|<ul></ul>|🟢|🟢|🟠
 Snapshots|Catch memory corruption.<br>`snapshots.c`, `snapshots.h`|<ul></ul>|🟠|🟢|🟠
 Dangling|Find dangling pointers.<br>`dangling.c`, `dangling.h`|<ul></ul>|🟠|🟢|🟠
@@ -22,6 +22,6 @@ Bounds|Offer manual bounds checking.<br>`bounds.c`, `bounds.h`|<ul><li>Find a so
 Signals|Intercept signals.<br>`signals.c`, `signals.h`|<ul></ul>|🟢|🟢|🟠
 Overrides|Automatically inject watchdog into code.<br>`overrides.c`, `overrides.h`, `watchdog.h`|<ul><li>`fopen`, etc.</li><li>Override common functions like `strlen`?</li><li>Check for incoming string literals?</li></ul>|🟠|🟠|🟠
 *Ignored*|Manually ignore certain addresses, like constants, when checking for untracked addresses.|<ul></ul>|🔴|🟠|🔴
-Reporter|Handle output of information.<br>`reporter.c`, `reporter.h`|<ul><li>Allow users to suppress warnings.</li><li>Fix memory leaks after informing the user.</li><li>Highlight non-native allocations in messages.</li><li>Make it clear whether something happened *before* or *after* an overridden operation.</li></ul>|🟠|🟠|🟠
+Reporter|Handle output of information.<br>`reporter.c`, `reporter.h`|<ul><li>Allow users to suppress warnings.</li><li>Highlight non-native allocations in messages.</li><li>Make it clear whether something happened *before* or *after* an overridden operation.</li></ul>|🟠|🟠|🟠
 Public Interface|Expose manual functionality to the user.<br>`public.c`, `public.h`|<ul></ul>|🟢|🟠|🟠
 Dogshed|Shared functionality and constants.<br>`dogshed.c`, `dogshed.h`|<ul><li>Distribute or collect constants? (e.g. messages, default sizes, etc.)</li></ul>|🟢|🟠|🟢

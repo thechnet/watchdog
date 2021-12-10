@@ -1,6 +1,6 @@
 /*
 radar.c - watchdog
-Modified 2021-12-09
+Modified 2021-12-10
 */
 
 /* Header-specific includes. */
@@ -13,6 +13,7 @@ Modified 2021-12-09
 #include "snapshots.h"
 #include "dangling.h"
 #include "padding.h"
+#include "overrides.h"
 
 /*
 *** Radar globals.
@@ -56,6 +57,15 @@ void wd_radar_disable(void)
   assert(wd_unleashed);
   assert(wd_radar != NULL);
   assert(wd_radar_size != 0);
+  
+  /* Free all remaining allocations. */ // FIXME: Unsure about all of this.
+  for (size_t i=0; i<wd_radar_size; i++)
+    if (wd_radar[i].addr_user != NULL && !wd_radar[i].dependent) {
+      wd_override_free(NULL, 0, wd_radar[i].addr_user); /* FIXME: Is this the right approach? At least for debugging it probably is, but later on we might want to replace this. */
+      
+      // free(wd_radar_addr_real_get(wd_radar+i));
+      // wd_radar_release(NULL, 0, wd_radar+i);
+    }
   
   free(wd_radar);
   wd_radar = NULL;
@@ -151,7 +161,7 @@ wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool 
   /* Update usage. */
   wd_usage_add(size_user);
   
-  wd_report("Radar: Add %p (%zu)", alloc->addr_user, alloc->size_user);
+  // wd_report("Radar: Add %p (%zu)", alloc->addr_user, alloc->size_user); // FIXME: Does not make sense here.
   
   return alloc;
 }
@@ -187,7 +197,7 @@ void wd_radar_release(WD_STD_PARAMS, wd_alloc *alloc)
   /* Update usage. */
   wd_usage_add(-alloc->size_user);
   
-  wd_report("Radar: Del %p", alloc->addr_user);
+  // wd_report("Radar: Del %p", alloc->addr_user); // FIXME: Does not make sense here.
   
   /* Clear radar entry. */
   wd_radar_clear(alloc);
@@ -350,7 +360,7 @@ void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *mig
   /* Update usage. */
   wd_usage_add(growth);
   
-  wd_report("Radar: Mod %p", alloc->addr_user);
+  // wd_report("Radar: Mod %p", alloc->addr_user); // FIXME: Does not make sense here.
 }
 
 /*

@@ -1,6 +1,6 @@
 /*
 public.c - watchdog
-Modified 2021-12-09
+Modified 2021-12-10
 */
 
 /* Header-specific includes. */
@@ -10,7 +10,7 @@ Modified 2021-12-09
 #include "dogshed.h"
 #include "radar.h"
 #include "reporter.h"
-#include "tracks.h"
+#include "pulse.h"
 #include "padding.h"
 #include "snapshots.h"
 #include "dangling.h"
@@ -54,7 +54,7 @@ void wd_unleash(WD_STD_PARAMS)
   wd_reporter_init();
   wd_radar_enable();
   wd_padding_generate();
-  wd_tracks_reset();
+  wd_pulse_reset();
   wd_dangling_open();
   wd_usage_reset();
   wd_signals_register();
@@ -74,6 +74,7 @@ int wd_bark(WD_STD_PARAMS)
   /* Assert that this function runs in the right circumstances. */
   WD_ENSURE_UNLEASHED();
   
+  /* Check padding and snapshots. */
   for (size_t i=0; i<wd_radar_size; i++)
     if (wd_radar[i].addr_user != NULL) {
       if (wd_radar[i].padding_check_left || wd_radar[i].padding_check_right)
@@ -82,7 +83,9 @@ int wd_bark(WD_STD_PARAMS)
         wd_snapshot_compare(WD_STD_PARAMS_PASS, wd_radar+i);
     }
   
-  wd_tracks_update(WD_STD_PARAMS_PASS);
+  /* Pulse. */
+  wd_pulse_update(WD_STD_PARAMS_PASS);
+  
   return 1;
 }
 

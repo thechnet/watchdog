@@ -11,8 +11,9 @@
 int main(void)
 {
   char *a = malloc(10);
-  strcpy(a, "abc");
-  free(a);
+  // printf("%s\n", 1);
+  // strcpy(a, "abc");
+  // free(a);
   
   printf("--- Summary:\n");
 }
