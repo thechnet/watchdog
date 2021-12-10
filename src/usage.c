@@ -47,27 +47,57 @@ void wd_usage_add(ptrdiff_t amount)
 }
 
 /*
-Capture the original memory.
+Create the original frame.
 */
-void wd_usage_original_capture(wd_alloc *alloc)
+void wd_original_frame_create(wd_alloc *alloc)
 {
   assert(alloc != NULL);
   assert(alloc->original == NULL);
   alloc->original = malloc(alloc->size_user);
   WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->original, 0, alloc->size_user);
-  memcpy(alloc->original, alloc->addr_user, alloc->size_user);
 }
 
 /*
-Update the original memory after reallocation.
+Destroy the original frame.
 */
-void wd_usage_original_update(wd_alloc *alloc, ptrdiff_t growth)
+void wd_original_frame_destroy(wd_alloc *alloc)
+{
+  assert(alloc != NULL);
+  assert(alloc->original != NULL);
+  free(alloc->original);
+  alloc->original = NULL;
+}
+
+/*
+Resize the original frame.
+*/
+void wd_original_frame_resize(wd_alloc *alloc)
 {
   assert(alloc != NULL);
   assert(alloc->is_native);
   assert(alloc->original != NULL);
   alloc->original = realloc(alloc->original, alloc->size_user);
   WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->original, 0, alloc->size_user);
+}
+
+/*
+Capture the original.
+*/
+void wd_original_capture(wd_alloc *alloc)
+{
+  assert(alloc != NULL);
+  assert(alloc->original != NULL);
+  memcpy(alloc->original, alloc->addr_user, alloc->size_user);
+}
+
+/*
+Update the original after reallocation.
+*/
+void wd_original_adjust(wd_alloc *alloc, ptrdiff_t growth)
+{
+  assert(alloc != NULL);
+  assert(alloc->is_native);
+  assert(alloc->original != NULL);
   if (growth <= 0)
     return;
   ptrdiff_t size_before = alloc->size_user-growth;
@@ -78,7 +108,7 @@ void wd_usage_original_update(wd_alloc *alloc, ptrdiff_t growth)
 /*
 Compare the final state of the memory to the original.
 */
-void wd_usage_original_compare(wd_alloc *alloc)
+void wd_original_compare(wd_alloc *alloc)
 {
   assert(alloc != NULL);
   size_t bytes_unchanged = 0;

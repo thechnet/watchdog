@@ -145,13 +145,15 @@ wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool 
     wd_padding_write(alloc);
     
     /* Take first snapshot. */
-    wd_snapshot_alloc(alloc);
+    wd_snapshot_frame_create(alloc);
     wd_snapshot_capture(alloc);
   }
   
   /* Capture original. */
-  if (is_native)
-    wd_usage_original_capture(alloc);
+  if (is_native) {
+    wd_original_frame_create(alloc);
+    wd_original_capture(alloc);
+  }
   
   /* Remove address from dangling pointer record if previously recorded. */
   wd_dangling_pointer *pointer = wd_dangling_search(alloc->addr_user);
@@ -178,18 +180,14 @@ void wd_radar_release(WD_STD_PARAMS, wd_alloc *alloc)
   assert(alloc->addr_user != NULL);
   
   /* Assess usage. */
-  if (alloc->is_native)
-    wd_usage_original_compare(alloc);
+  if (alloc->is_native) {
+    wd_original_compare(alloc);
+    wd_original_frame_destroy(alloc);
+  }
   
   /* Free auxiliary memory. */
-  if (alloc->is_protected) {
-    assert(alloc->snapshot != NULL);
-    free(alloc->snapshot);
-  }
-  if (alloc->is_native) {
-    assert(alloc->original != NULL);
-    free(alloc->original);
-  }
+  if (alloc->is_protected)
+    wd_snapshot_frame_destroy(alloc);
   
   /* Record address in dangling pointer record. */
   wd_dangling_record(WD_STD_PARAMS_PASS, alloc->addr_user);
@@ -315,7 +313,7 @@ void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *mig
     migrated_real = migrated_real_padded;
     
     /* Enable snapshots. */
-    wd_snapshot_alloc(alloc);
+    wd_snapshot_frame_create(alloc);
     
     alloc->is_protected = true;
     alloc->padding_check_left = true;
@@ -349,13 +347,15 @@ void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *mig
   
   /* Update snapshot. */
   if (alloc->snapshot != NULL) {
-    wd_snapshot_realloc(alloc);
+    wd_snapshot_frame_resize(alloc);
     wd_snapshot_capture(alloc);
   }
   
   /* Update original. */
-  if (alloc->is_native)
-    wd_usage_original_update(alloc, growth);
+  if (alloc->is_native) {
+    wd_original_frame_resize(alloc);
+    wd_original_adjust(alloc, growth);
+  }
   
   /* Update usage. */
   wd_usage_add(growth);

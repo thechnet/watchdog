@@ -9,6 +9,7 @@ Modified 2021-12-09
 /* Header-specific includes. */
 #include <stdlib.h>
 #include <stdint.h>
+#include <stddef.h>
 
 /*
 *** Overrides helpers. FIXME: Where do we put these? They are also needed in bounds.c.

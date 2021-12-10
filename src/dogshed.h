@@ -9,6 +9,7 @@ Modified 2021-12-10
 /* Header-specific includes. */
 #include <stdbool.h>
 #include <assert.h>
+#include <stddef.h>
 #ifdef _WIN32
 #include <io.h>
 #define STDOUT_FILENO 1

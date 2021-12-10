@@ -17,8 +17,9 @@ Modified 2021-12-09
 /*
 Allocate snapshot memory.
 */
-void wd_snapshot_alloc(wd_alloc *alloc)
+void wd_snapshot_frame_create(wd_alloc *alloc)
 {
+  assert(alloc != NULL);
   assert(alloc->snapshot == NULL);
   alloc->snapshot = malloc(alloc->size_user);
   WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->snapshot, 0, alloc->size_user);
@@ -27,11 +28,23 @@ void wd_snapshot_alloc(wd_alloc *alloc)
 /*
 Reallocate snapshot memory.
 */
-void wd_snapshot_realloc(wd_alloc *alloc)
+void wd_snapshot_frame_resize(wd_alloc *alloc)
 {
+  assert(alloc != NULL);
   assert(alloc->snapshot != NULL);
   alloc->snapshot = realloc(alloc->snapshot, alloc->size_user);
   WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(alloc->snapshot, 0, alloc->size_user);
+}
+
+/*
+Destroy snapshot frame.
+*/
+void wd_snapshot_frame_destroy(wd_alloc *alloc)
+{
+  assert(alloc != NULL);
+  assert(alloc->snapshot != NULL);
+  free(alloc->snapshot);
+  alloc->snapshot = NULL;
 }
 
 /*
@@ -39,6 +52,7 @@ Take snapshot.
 */
 void wd_snapshot_capture(wd_alloc *alloc)
 {
+  assert(alloc != NULL);  
   assert(alloc->snapshot != NULL);
   memcpy(alloc->snapshot, alloc->addr_user, alloc->size_user);
 }
@@ -48,6 +62,7 @@ Check snapshot.
 */
 void wd_snapshot_compare(WD_STD_PARAMS, wd_alloc *alloc)
 {
+  assert(alloc != NULL);
   assert(alloc->is_protected);
   assert(alloc->snapshot != NULL);
   

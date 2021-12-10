@@ -8,6 +8,7 @@ Modified 2021-12-09
 
 /* Header-specific includes. */
 #include <stdlib.h>
+#include <stddef.h>
 
 /*
 *** Bounds interface.

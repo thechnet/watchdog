@@ -14,8 +14,9 @@ Modified 2021-12-04
 *** Snapshots interface.
 */
 
-void wd_snapshot_alloc(wd_alloc *alloc);
-void wd_snapshot_realloc(wd_alloc *alloc);
+void wd_snapshot_frame_create(wd_alloc *alloc);
+void wd_snapshot_frame_resize(wd_alloc *alloc);
+void wd_snapshot_frame_destroy(wd_alloc *alloc);
 void wd_snapshot_capture(wd_alloc *alloc);
 void wd_snapshot_compare(WD_STD_PARAMS, wd_alloc *alloc);
 

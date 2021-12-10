@@ -26,8 +26,12 @@ extern ptrdiff_t wd_usage_total_allocated;
 
 void wd_usage_reset(void);
 void wd_usage_add(ptrdiff_t amount);
-void wd_usage_original_capture(wd_alloc *alloc);
-void wd_usage_original_update(wd_alloc *alloc, ptrdiff_t growth);
-void wd_usage_original_compare(wd_alloc *alloc);
+
+void wd_original_frame_create(wd_alloc *alloc);
+void wd_original_frame_resize(wd_alloc *alloc);
+void wd_original_frame_destroy(wd_alloc *alloc);
+void wd_original_capture(wd_alloc *alloc);
+void wd_original_adjust(wd_alloc *alloc, ptrdiff_t growth);
+void wd_original_compare(wd_alloc *alloc);
 
 #endif /* !WD_USAGE_H */
