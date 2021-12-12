@@ -1,13 +1,12 @@
 /*
 usage.h - watchdog
-Modified 2021-12-09
+Modified 2021-12-12
 */
 
 #ifndef WD_USAGE_H
 #define WD_USAGE_H
 
 /* Header-specific includes. */
-#include <stdint.h>
 #include "dogshed.h"
 #include "radar.h"
 
@@ -25,7 +24,7 @@ extern ptrdiff_t wd_usage_total_allocated;
 */
 
 void wd_usage_reset(void);
-void wd_usage_add(ptrdiff_t amount);
+void wd_usage_offset(ptrdiff_t amount);
 
 void wd_original_frame_create(wd_alloc *alloc);
 void wd_original_frame_resize(wd_alloc *alloc);

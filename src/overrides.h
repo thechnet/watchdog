@@ -1,6 +1,6 @@
 /*
 overrides.h - watchdog
-Modified 2021-12-09
+Modified 2021-12-12
 */
 
 #ifndef WD_OVERRIDES_H
@@ -57,7 +57,7 @@ Modified 2021-12-09
 
 #define WD_WARN_IF_PTR_DANGLING(ptr)\
   {\
-    wd_dangling_pointer *_ptr = wd_dangling_search(ptr);\
+    wd_archived *_ptr = wd_archive_query(ptr);\
     if (_ptr != NULL) {\
       wd_alerts++;\
       warn_at(file, line, WD_MSG_INCOMING_DANGLING, _ptr->freed_at.file, _ptr->freed_at.line);\
@@ -70,15 +70,15 @@ Modified 2021-12-09
       wd_alerts++;\
       warn_at(file, line, WD_MSG_INCOMING_UNTRACKED, id);\
     }\
-  }\
+  }
 
 #define WD_FAIL_IF_RADAR_FINDS_PTR_ENCLOSED(radar_locate__response, id)\
   {\
-    if (radar_locate__response != NULL) {\
+    if (radar_locate__response == WD_RADAR_ORIENTATE_ENCLOSED) {\
       wd_alerts++;\
       fail_at(file, line, WD_MSG_INCOMING_ENCLOSED, id);\
     }\
-  }\
+  }
 
 #define WD_INFO_IF_RADAR_FINDS_PTR_UNTRACKED(radar_search__response, id)\
   {\
@@ -86,7 +86,7 @@ Modified 2021-12-09
       wd_alerts++;\
       info_at(file, line, WD_MSG_INCOMING_UNTRACKED, id);\
     }\
-  }\
+  }
 
 /*
 *** Overrides.

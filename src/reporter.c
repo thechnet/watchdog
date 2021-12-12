@@ -1,6 +1,6 @@
 /*
 reporter.c - watchdog
-Modified 2021-12-10
+Modified 2021-12-12
 */
 
 /* Header-specific includes. */
@@ -26,7 +26,7 @@ size_t wd_reporter_log_count = 0;
 /*
 Initialize the reporter.
 */
-void wd_reporter_init(void)
+void wd_reporter_initialize(void)
 {
   #ifndef WD_REPORTER_ENABLE
   return;
@@ -42,7 +42,7 @@ void wd_reporter_init(void)
 /*
 Deinitialize the reporter.
 */
-void wd_reporter_deinit(void)
+void wd_reporter_terminate(void)
 {
   if (wd_reporter_log == NULL)
     return;

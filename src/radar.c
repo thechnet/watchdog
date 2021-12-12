@@ -1,6 +1,6 @@
 /*
 radar.c - watchdog
-Modified 2021-12-10
+Modified 2021-12-12
 */
 
 /* Header-specific includes. */
@@ -11,7 +11,7 @@ Modified 2021-12-10
 #include "reporter.h"
 #include "usage.h"
 #include "snapshots.h"
-#include "dangling.h"
+#include "archive.h"
 #include "padding.h"
 #include "overrides.h"
 
@@ -23,61 +23,32 @@ wd_alloc *wd_radar = NULL;
 size_t wd_radar_size = 0;
 
 /*
-*** Radar interface.
+*** Radar static helpers.
 */
 
 /*
-Start the radar.
+Clear an entry in the radar.
 */
-void wd_radar_enable(void)
+static void wd_radar_clear_slot(wd_alloc *alloc)
 {
-  /* Assert that this function runs in the right circumstances. */
-  assert(!wd_unleashed);
-  assert(wd_radar == NULL);
-  assert(wd_radar_size == 0);
-  
-  /* Create radar. */
-  wd_radar_size = WD_RADAR_SIZE;
-  wd_radar = malloc(wd_radar_size*sizeof(*wd_radar));
-  WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(wd_radar, 0, wd_radar_size*sizeof(*wd_radar));
-  
-  /* Zero the spots. */
-  for (size_t i=0; i<wd_radar_size; i++)
-    wd_radar_clear(wd_radar+i);
-  
-  wd_report("Radar: Enable");
-}
-
-/*
-Stop the radar.
-*/
-void wd_radar_disable(void)
-{
-  /* Assert that this function runs in the right circumstances. */
-  assert(wd_unleashed);
-  assert(wd_radar != NULL);
-  assert(wd_radar_size != 0);
-  
-  /* Free all remaining allocations. */ // FIXME: Unsure about all of this.
-  for (size_t i=0; i<wd_radar_size; i++)
-    if (wd_radar[i].addr_user != NULL && !wd_radar[i].dependent) {
-      wd_override_free(NULL, 0, wd_radar[i].addr_user); /* FIXME: Is this the right approach? At least for debugging it probably is, but later on we might want to replace this. */
-      
-      // free(wd_radar_addr_real_get(wd_radar+i));
-      // wd_radar_release(NULL, 0, wd_radar+i);
-    }
-  
-  free(wd_radar);
-  wd_radar = NULL;
-  wd_radar_size = 0;
-  
-  wd_report("Radar: Disable");
+  *alloc = (wd_alloc){
+    .point = (wd_point){ NULL, 0 },
+    .size_user = 0,
+    .addr_user = NULL,
+    .dependent = false,
+    .is_protected = false,
+    .snapshot = NULL,
+    .padding_check_left = false,
+    .padding_check_right = false,
+    .is_native = false,
+    .original = NULL
+  };
 }
 
 /*
 Find the next free spot on the radar, or grow it.
 */
-wd_alloc *wd_radar_find_spot(void)
+static wd_alloc *wd_radar_find_or_create_slot(void)
 {
   /* Look for an empty spot in the radar. */
   wd_alloc *alloc = NULL;
@@ -94,7 +65,7 @@ wd_alloc *wd_radar_find_spot(void)
     wd_radar = realloc(wd_radar, wd_radar_size*sizeof(*wd_radar));
     WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(wd_radar, 0, wd_radar_size*sizeof(*wd_radar));
     for (size_t i=size_old; i<wd_radar_size; i++) /* Initialize the newly added spots. */
-      wd_radar_clear(wd_radar+i);
+      wd_radar_clear_slot(wd_radar+i);
     alloc = wd_radar+size_old;
   }
   
@@ -102,9 +73,54 @@ wd_alloc *wd_radar_find_spot(void)
 }
 
 /*
+*** Radar interface.
+*/
+
+/*
+Start the radar.
+*/
+void wd_radar_initialize(void)
+{
+  /* Assert that this function runs in the right circumstances. */
+  assert(!wd_unleashed);
+  assert(wd_radar == NULL);
+  assert(wd_radar_size == 0);
+  
+  /* Create radar. */
+  wd_radar_size = WD_RADAR_SIZE;
+  wd_radar = malloc(wd_radar_size*sizeof(*wd_radar));
+  WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(wd_radar, 0, wd_radar_size*sizeof(*wd_radar));
+  
+  /* Zero the spots. */
+  for (size_t i=0; i<wd_radar_size; i++)
+    wd_radar_clear_slot(wd_radar+i);
+  
+  wd_report("Radar: Enable");
+}
+
+/*
+Stop the radar.
+*/
+void wd_radar_terminate(void)
+{
+  /* Assert that this function runs in the right circumstances. */
+  assert(wd_unleashed);
+  assert(wd_radar != NULL);
+  assert(wd_radar_size != 0);
+  
+  /* I have decided not to free the unfreed allocations at this point, in an attempt to keep the state of the program after its execution more authentic. */
+  
+  free(wd_radar);
+  wd_radar = NULL;
+  wd_radar_size = 0;
+  
+  wd_report("Radar: Disable");
+}
+
+/*
 Start tracking an address on the radar.
 */
-wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool protect, bool is_native, bool dependent, bool randomize_memory)
+wd_alloc *wd_radar_add(WD_STD_PARAMS, char *addr_real, size_t size_user, bool protect, bool is_native, bool dependent, bool randomize_memory)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -112,7 +128,7 @@ wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool 
   assert(addr_real != NULL);
   
   /* Find the next free spot. */
-  wd_alloc *alloc = wd_radar_find_spot();
+  wd_alloc *alloc = wd_radar_find_or_create_slot();
   
   /* Convert real address to user address. */
   char *addr_user;
@@ -155,13 +171,13 @@ wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool 
     wd_original_capture(alloc);
   }
   
-  /* Remove address from dangling pointer record if previously recorded. */
-  wd_dangling_pointer *pointer = wd_dangling_search(alloc->addr_user);
+  /* Remove address from archive pointer record if previously recorded. */
+  wd_archived *pointer = wd_archive_query(alloc->addr_user);
   if (pointer != NULL)
-    wd_dangling_clear(pointer);
+    wd_archive_erase(pointer);
   
   /* Update usage. */
-  wd_usage_add(size_user);
+  wd_usage_offset(size_user);
   
   // wd_report("Radar: Add %p (%zu)", alloc->addr_user, alloc->size_user); // FIXME: Does not make sense here.
   
@@ -169,128 +185,9 @@ wd_alloc *wd_radar_catch(WD_STD_PARAMS, char *addr_real, size_t size_user, bool 
 }
 
 /*
-Stop tracking an address on the radar.
-*/
-void wd_radar_release(WD_STD_PARAMS, wd_alloc *alloc)
-{
-  /* Assert that this function runs in the right circumstances. */
-  assert(wd_unleashed);
-  assert(wd_radar != NULL);
-  assert(alloc != NULL);
-  assert(alloc->addr_user != NULL);
-  
-  /* Assess usage. */
-  if (alloc->is_native) {
-    wd_original_compare(alloc);
-    wd_original_frame_destroy(alloc);
-  }
-  
-  /* Free auxiliary memory. */
-  if (alloc->is_protected)
-    wd_snapshot_frame_destroy(alloc);
-  
-  /* Record address in dangling pointer record. */
-  wd_dangling_record(WD_STD_PARAMS_PASS, alloc->addr_user);
-  
-  /* Update usage. */
-  wd_usage_add(-alloc->size_user);
-  
-  // wd_report("Radar: Del %p", alloc->addr_user); // FIXME: Does not make sense here.
-  
-  /* Clear radar entry. */
-  wd_radar_clear(alloc);
-}
-
-/*
-Clear an entry in the radar.
-*/
-void wd_radar_clear(wd_alloc *alloc)
-{
-  *alloc = (wd_alloc){
-    .point = (wd_point){ NULL, 0 },
-    .size_user = 0,
-    .addr_user = NULL,
-    .dependent = false,
-    .is_protected = false,
-    .snapshot = NULL,
-    .padding_check_left = false,
-    .padding_check_right = false,
-    .is_native = false,
-    .original = NULL
-  };
-}
-
-/*
-Locate an address on the radar.
-*/
-wd_alloc *wd_radar_search(char *addr_user)
-{
-  /* Assert that this function runs in the right circumstances. */
-  assert(wd_unleashed);
-  assert(wd_radar != NULL);
-  assert(addr_user != NULL);
-  
-  for (size_t i=0; i<wd_radar_size; i++)
-    if (wd_radar[i].addr_user == addr_user)
-      return wd_radar+i;
-  return NULL;
-}
-
-/*
-Retrieve the real size.
-*/
-size_t wd_radar_size_real_get(wd_alloc *alloc)
-{
-  assert(alloc != NULL);
-  return alloc->size_user+2*WD_PADDING_SIZE;
-}
-
-/*
-Retrieve the real address.
-*/
-char *wd_radar_addr_real_get(wd_alloc *alloc)
-{
-  assert(alloc != NULL);
-  if (alloc->is_protected)
-    return alloc->addr_user-WD_PADDING_SIZE;
-  else
-    return alloc->addr_user;
-}
-
-/*
-Update the virtual address.
-*/
-void wd_radar_addr_user_set(wd_alloc *alloc, char *migrated_real)
-{
-  assert(alloc != NULL);
-  assert(migrated_real != NULL);
-  if (alloc->is_protected)
-    alloc->addr_user = migrated_real+WD_PADDING_SIZE;
-  else
-    alloc->addr_user = migrated_real;
-}
-
-/*
-Unlock an allocation for reallocation.
-*/
-void wd_radar_unlock(wd_alloc *alloc)
-{
-  /* Assert that this function runs in the right circumstances. */
-  assert(wd_unleashed);
-  assert(wd_radar != NULL);
-  assert(alloc != NULL);
-  assert(alloc->addr_user != NULL);
-  assert(!alloc->dependent);
-  
-  if (alloc->is_protected)
-    /* We do not clear the left padding to avoid potentially loosing evidence. */
-    wd_padding_clear_right(alloc);
-}
-
-/*
 Lock an allocation after reallocation.
 */
-void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *migrated_real)
+void wd_radar_update(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *migrated_real)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -325,14 +222,14 @@ void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *mig
   int growth = resize_user-alloc->size_user;
   alloc->size_user = resize_user;
   
-  /* Record old address in dangling pointer record if the new address is different. */
+  /* Record old address in archive pointer record if the new address is different. */
   if (migrated_real != wd_radar_addr_real_get(alloc))
-    wd_dangling_record(WD_STD_PARAMS_PASS, wd_radar_addr_real_get(alloc));
+    wd_archive_record(WD_STD_PARAMS_PASS, wd_radar_addr_real_get(alloc));
   
-  /* Remove new address from dangling pointer record if previously recorded. */
-  wd_dangling_pointer *pointer = wd_dangling_search(alloc->addr_user);
+  /* Remove new address from archive pointer record if previously recorded. */
+  wd_archived *pointer = wd_archive_query(alloc->addr_user);
   if (pointer != NULL)
-    wd_dangling_clear(pointer);
+    wd_archive_erase(pointer);
   
   /* Re-add padding. */
   if (alloc->is_protected) {
@@ -358,25 +255,122 @@ void wd_radar_lock(WD_STD_PARAMS, wd_alloc *alloc, size_t resize_user, char *mig
   }
   
   /* Update usage. */
-  wd_usage_add(growth);
+  wd_usage_offset(growth);
   
   // wd_report("Radar: Mod %p", alloc->addr_user); // FIXME: Does not make sense here.
 }
 
 /*
+Stop tracking an address on the radar.
+*/
+void wd_radar_remove(WD_STD_PARAMS, wd_alloc *alloc)
+{
+  /* Assert that this function runs in the right circumstances. */
+  assert(wd_unleashed);
+  assert(wd_radar != NULL);
+  assert(alloc != NULL);
+  assert(alloc->addr_user != NULL);
+  
+  /* Assess usage. */
+  if (alloc->is_native) {
+    wd_original_compare(alloc);
+    wd_original_frame_destroy(alloc);
+  }
+  
+  /* Free auxiliary memory. */
+  if (alloc->is_protected)
+    wd_snapshot_frame_destroy(alloc);
+  
+  /* Record address in archive pointer record. */
+  wd_archive_record(WD_STD_PARAMS_PASS, alloc->addr_user);
+  
+  /* Update usage. */
+  wd_usage_offset(-alloc->size_user);
+  
+  // wd_report("Radar: Del %p", alloc->addr_user); // FIXME: Does not make sense here.
+  
+  /* Clear radar entry. */
+  wd_radar_clear_slot(alloc);
+}
+
+/*
+Locate an address on the radar.
+*/
+wd_alloc *wd_radar_search(char *addr_user)
+{
+  /* Assert that this function runs in the right circumstances. */
+  assert(wd_unleashed);
+  assert(wd_radar != NULL);
+  assert(addr_user != NULL);
+  
+  for (size_t i=0; i<wd_radar_size; i++)
+    if (wd_radar[i].addr_user == addr_user)
+      return wd_radar+i;
+  return NULL;
+}
+
+/*
 Locate the allocation containing the provided address.
 */
-wd_alloc *wd_radar_locate(char *address)
+int wd_radar_orientate(char *address, wd_alloc **alloc)
 {
   assert(address != NULL);
   for (size_t i=0; i<wd_radar_size; i++) {
     if (wd_radar[i].dependent && wd_radar[i].size_user == 0)
       continue;
-    if (address < wd_radar[i].addr_user)
+    if (address >= wd_radar[i].addr_user && address < wd_radar[i].addr_user+wd_radar[i].size_user) {
+      if (alloc != NULL)
+        *alloc = wd_radar+i;
+      return WD_RADAR_ORIENTATE_ENCLOSED;
+    }
+    if (!wd_radar[i].is_protected)
       continue;
-    if (address >= wd_radar[i].addr_user+wd_radar[i].size_user)
-      continue;
-    return wd_radar+i;
+    if (address >= WD_ADDR_USER_MAKE_REAL(wd_radar[i].addr_user) && address < wd_radar[i].addr_user) {
+      if (alloc != NULL)
+        *alloc = wd_radar+i;
+      return WD_RADAR_ORIENTATE_TOUCHING_LEFT;
+    }
+    if (address >= wd_radar[i].addr_user+wd_radar[i].size_user && address < wd_radar[i].addr_user+wd_radar[i].size_user+WD_PADDING_SIZE) {
+      if (alloc != NULL)
+        *alloc = wd_radar+i;
+      return WD_RADAR_ORIENTATE_TOUCHING_RIGHT;
+    }
   }
-  return NULL;
+  if (alloc != NULL)
+    *alloc = NULL;
+  return WD_RADAR_ORIENTATE_UNFOUND;
+}
+
+/*
+Retrieve the real size.
+*/
+size_t wd_radar_size_real_get(wd_alloc *alloc)
+{
+  assert(alloc != NULL);
+  return alloc->size_user+2*WD_PADDING_SIZE;
+}
+
+/*
+Retrieve the real address.
+*/
+char *wd_radar_addr_real_get(wd_alloc *alloc)
+{
+  assert(alloc != NULL);
+  if (alloc->is_protected)
+    return alloc->addr_user-WD_PADDING_SIZE;
+  else
+    return alloc->addr_user;
+}
+
+/*
+Update the virtual address.
+*/
+void wd_radar_addr_user_set(wd_alloc *alloc, char *migrated_real)
+{
+  assert(alloc != NULL);
+  assert(migrated_real != NULL);
+  if (alloc->is_protected)
+    alloc->addr_user = migrated_real+WD_PADDING_SIZE;
+  else
+    alloc->addr_user = migrated_real;
 }

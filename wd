@@ -4,7 +4,7 @@ src/reporter.c
 src/pulse.c
 src/padding.c
 src/snapshots.c
-src/dangling.c
+src/archive.c
 src/usage.c
 src/overrides.c
 src/public.c

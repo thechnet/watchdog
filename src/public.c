@@ -1,6 +1,6 @@
 /*
 public.c - watchdog
-Modified 2021-12-10
+Modified 2021-12-12
 */
 
 /* Header-specific includes. */
@@ -13,7 +13,7 @@ Modified 2021-12-10
 #include "pulse.h"
 #include "padding.h"
 #include "snapshots.h"
-#include "dangling.h"
+#include "archive.h"
 #include "usage.h"
 #include "signals.h"
 
@@ -36,9 +36,9 @@ void wd_restrain(void)
   assert(wd_unleashed);
   
   wd_reporter_summary();
-  wd_radar_disable();
-  wd_dangling_close();
-  wd_reporter_deinit();
+  wd_radar_terminate();
+  wd_archive_terminate();
+  wd_reporter_terminate();
   
   wd_unleashed = false;
 }
@@ -51,11 +51,11 @@ void wd_unleash(WD_STD_PARAMS)
   /* Assert that this function runs in the right circumstances. */
   assert(!wd_unleashed);
   
-  wd_reporter_init();
-  wd_radar_enable();
+  wd_reporter_initialize();
+  wd_radar_initialize();
   wd_padding_generate();
   wd_pulse_reset();
-  wd_dangling_open();
+  wd_archive_initialize();
   wd_usage_reset();
   wd_signals_register();
   
@@ -99,5 +99,5 @@ void wd_ignore(WD_STD_PARAMS, char *addr_user, ptrdiff_t size_user)
   WD_ENSURE_UNLEASHED();
   wd_bark(WD_STD_PARAMS_PASS);
   
-  wd_radar_catch(NULL, 0, addr_user, size_user, false, false, true, false);
+  wd_radar_add(NULL, 0, addr_user, size_user, false, false, true, false);
 }

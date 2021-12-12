@@ -12,11 +12,11 @@
 
 Module|Description|Notes|Structure|Features|Stability
 -|-|-|-|-|-
-Radar|Find memory leaks.<br>`radar.c`, `radar.h`|<ul><li>Remove `.is_native`?</li><li>What do we do if an address is `locate`'d within the padding of an allocation?</li><li>Fix memory leaks after informing the user?</li></ul>|🟠|🟢|🟠
+Radar|Find memory leaks.<br>`radar.c`, `radar.h`|<ul><li>Remove `.is_native`?</li><li>What do we do if an address is `locate`'d within the padding of an allocation?</li></ul>|🟠|🟢|🟠
 Pulse|Narrow down crash sites.<br>`pulse.c`, `pulse.h`|<ul></ul>|🟢|🟢|🟢
 Padding|Catch buffer overflows.<br>`padding.c`, `padding.h`|<ul></ul>|🟢|🟢|🟠
 Snapshots|Catch memory corruption.<br>`snapshots.c`, `snapshots.h`|<ul></ul>|🟢|🟢|🟠
-Dangling|Find dangling pointers.<br>`dangling.c`, `dangling.h`|<ul></ul>|🟠|🟢|🟠
+Archive|Warn about dangling pointers.<br>`archive.c`, `archive.h`|<ul></ul>|🟠|🟢|🟠
 Usage|Profile memory usage.<br>`usage.c`, `usage.h`|<ul></ul>|🟠|🟠|🟠
 Bounds|Offer manual bounds checking.<br>`bounds.c`, `bounds.h`|<ul><li>Find a solution to the uncertainty when receiving untracked pointers.</li><li>Should we allow negative indices?</li></ul>|🟠|🟠|🟠
 Signals|Intercept signals.<br>`signals.c`, `signals.h`|<ul></ul>|🟢|🟢|🟠

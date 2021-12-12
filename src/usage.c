@@ -1,6 +1,6 @@
 /*
 usage.c - watchdog
-Modified 2021-12-09
+Modified 2021-12-12
 */
 
 /* Header-specific includes. */
@@ -38,7 +38,7 @@ void wd_usage_reset(void)
 /*
 Add amount to current memory usage.
 */
-void wd_usage_add(ptrdiff_t amount)
+void wd_usage_offset(ptrdiff_t amount)
 {
   assert(wd_usage_current_allocated+amount >= 0);
   wd_usage_current_allocated += amount;

@@ -1,6 +1,6 @@
 /*
 overrides.c - watchdog
-Modified 2021-12-09
+Modified 2021-12-12
 */
 
 /* Header-specific includes. */
@@ -14,7 +14,7 @@ Modified 2021-12-09
 #include "reporter.h"
 #include "public.h"
 #include "padding.h"
-#include "dangling.h"
+#include "archive.h"
 #include "snapshots.h"
 #include "usage.h"
 
@@ -41,7 +41,7 @@ void *wd_override_malloc(WD_STD_PARAMS, ptrdiff_t size_user)
   WD_FAIL_IF_OUT_OF_MEMORY(addr_real, size_user, WD_SIZE_REAL_MARKUP);
   
   /* Add new allocation to radar. */
-  wd_alloc *alloc = wd_radar_catch(WD_STD_PARAMS_PASS, addr_real, size_user, true, true, false, true);
+  wd_alloc *alloc = wd_radar_add(WD_STD_PARAMS_PASS, addr_real, size_user, true, true, false, true);
   
   return (void*)alloc->addr_user;
 }
@@ -62,19 +62,16 @@ void *wd_override_realloc(WD_STD_PARAMS, char *addr_user, ptrdiff_t resize_user)
   
   /* If the incoming address is untracked, attempt to locate its surrounding allocation. */
   if (alloc == NULL) {
-    wd_alloc *surrounding = wd_radar_locate(addr_user);
+    int surrounding = wd_radar_orientate(addr_user, NULL);
     WD_FAIL_IF_RADAR_FINDS_PTR_ENCLOSED(surrounding, "");
   }
   /* Otherwise, warn the user... */
   WD_WARN_IF_RADAR_FINDS_PTR_UNTRACKED(alloc, "");
   /* ... and start tracking the new address. */
   if (alloc == NULL)
-    alloc = wd_radar_catch(WD_STD_PARAMS_PASS, addr_user, 0, false, false, false, false);
+    alloc = wd_radar_add(WD_STD_PARAMS_PASS, addr_user, 0, false, false, false, false);
   
   WD_WARN_IF_SIZE_REDUCED(alloc->size_user, resize_user);
-  
-  /* Prepare allocation for reallocation. */
-  wd_radar_unlock(alloc);
   
   /* Reallocate memory. */
   char *addr_real = wd_radar_addr_real_get(alloc);
@@ -86,7 +83,7 @@ void *wd_override_realloc(WD_STD_PARAMS, char *addr_user, ptrdiff_t resize_user)
   WD_FAIL_IF_OUT_OF_MEMORY(migrated_real, resize_user, resize_real-resize_user);
   
   /* Lock allocation. */
-  wd_radar_lock(WD_STD_PARAMS_PASS, alloc, resize_user, migrated_real);
+  wd_radar_update(WD_STD_PARAMS_PASS, alloc, resize_user, migrated_real);
   
   return (void*)alloc->addr_user;
 }
@@ -105,7 +102,7 @@ void wd_override_free(WD_STD_PARAMS, char *addr_user)
   wd_alloc *alloc = wd_radar_search(addr_user);
   /* If the incoming address is untracked, attempt to locate its surrounding allocation. */
   if (alloc == NULL) {
-    wd_alloc *surrounding = wd_radar_locate(addr_user);
+    int surrounding = wd_radar_orientate(addr_user, NULL);
     WD_FAIL_IF_RADAR_FINDS_PTR_ENCLOSED(surrounding, "");
   }
   /* Otherwise, warn the user. */
@@ -120,7 +117,7 @@ void wd_override_free(WD_STD_PARAMS, char *addr_user)
   
   /* Drop allocation if tracked. */
   if (alloc != NULL)
-    wd_radar_release(WD_STD_PARAMS_PASS, alloc);
+    wd_radar_remove(WD_STD_PARAMS_PASS, alloc);
   
   /* Free memory. */
   free(addr_real);
@@ -155,8 +152,8 @@ char *wd_override_strdup(WD_STD_PARAMS, char *src_user)
   wd_alloc *src_alloc = wd_radar_search(src_user);
   /* If the incoming address is untracked, attempt to locate its surrounding allocation. */
   if (src_alloc == NULL) {
-    wd_alloc *surrounding = wd_radar_locate(src_user);
-    if (surrounding == NULL)
+    int surrounding = wd_radar_orientate(src_user, NULL);
+    if (surrounding != WD_RADAR_ORIENTATE_ENCLOSED)
       WD_INFO_IF_RADAR_FINDS_PTR_UNTRACKED(src_alloc, "");
   }
   
@@ -171,7 +168,7 @@ char *wd_override_strdup(WD_STD_PARAMS, char *src_user)
   strcpy(addr_user, src_user);
   
   /* Record on radar. */
-  wd_alloc *alloc = wd_radar_catch(WD_STD_PARAMS_PASS, addr_real, size_user, true, true, false, false);
+  wd_alloc *alloc = wd_radar_add(WD_STD_PARAMS_PASS, addr_real, size_user, true, true, false, false);
   
   return alloc->addr_user;
 }
