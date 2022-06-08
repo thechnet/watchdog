@@ -72,9 +72,9 @@ Modified 2022-06-08
     }\
   } while(0)
 
-#define WD_FAIL_IF_RADAR_FINDS_PTR_ENCLOSED(radar_locate__response, id)\
+#define WD_FAIL_IF_RADAR_FINDS_PTR_ENCLOSED(radar_orientate__response, id)\
   do {\
-    if (radar_locate__response == WD_RADAR_ORIENTATE_ENCLOSED) {\
+    if (radar_orientate__response == WD_RADAR_ORIENTATE_ENCLOSED) {\
       wd_alerts++;\
       fail_at(file, line, WD_MSG_INCOMING_ENCLOSED, id);\
     }\

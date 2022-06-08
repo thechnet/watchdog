@@ -69,7 +69,8 @@ void wd_reporter_summary(void)
       warn_at(wd_radar[i].point.file, wd_radar[i].point.line, WD_MSG_NOT_FREED);
     }
   if (radar_empty)
-    success(WD_MSG_ALL_FREED);
+    // success(WD_MSG_ALL_FREED);
+    wprintf(__LOGGING_WIDE __LOGGING_STYLE_SUCCESS __LOGGING_ID WD_MSG_ALL_FREED __LOGGING_TERMINATOR); // FIXME: Allow this natively in logging.h.
   
   printf(
     "\nusage_current_allocated: %zu b\n"

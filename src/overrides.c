@@ -1,6 +1,6 @@
 /*
 overrides.c - watchdog
-Modified 2021-12-12
+Modified 2022-06-08
 */
 
 /* Header-specific includes. */
@@ -56,6 +56,9 @@ void *wd_override_realloc(WD_STD_PARAMS, char *addr_user, ptrdiff_t resize_user)
   
   /* Verify incoming values. */
   WD_WARN_IF_PTR_NULL(addr_user);
+  /* If incoming address is NULL, behave like malloc. */
+  if (addr_user == NULL)
+    return wd_override_malloc(WD_STD_ARGS, resize_user);
   WD_WARN_IF_PTR_DANGLING(addr_user);
   WD_WARN_IF_SIZE_LEQ_0(resize_user);
   wd_alloc *alloc = wd_radar_search(addr_user);
@@ -189,9 +192,9 @@ char *wd_override_strcpy(WD_STD_PARAMS, char *dest_user, char *src_user)
   
   /* Check if incoming memory recorded. */
   wd_alloc *dest_alloc = wd_radar_search(dest_user);
-  WD_INFO_IF_RADAR_FINDS_PTR_UNTRACKED(dest_alloc, " <dest>");
+  WD_INFO_IF_RADAR_FINDS_PTR_UNTRACKED(dest_alloc, L" <dest>");
   wd_alloc *src_alloc = wd_radar_search(src_user);
-  WD_INFO_IF_RADAR_FINDS_PTR_UNTRACKED(src_alloc, " <src>");
+  WD_INFO_IF_RADAR_FINDS_PTR_UNTRACKED(src_alloc, L" <src>");
   
   /* Compare string lengths. */
   size_t dest_len;

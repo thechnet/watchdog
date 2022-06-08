@@ -1,6 +1,6 @@
 /*
 archive.h - watchdog
-Modified 2021-12-12
+Modified 2022-06-08
 */
 
 #ifndef WD_ARCHIVE_H
@@ -38,7 +38,7 @@ extern wd_archived *wd_archive;
 void wd_archive_initialize(void);
 void wd_archive_terminate(void);
 void wd_archive_record(WD_STD_PARAMS, char *addr_user);
-void wd_archive_erase(wd_archived *pointer);
+void wd_archive_erase(wd_archived *slot);
 wd_archived *wd_archive_query(char *addr_user);
 
 #endif /* !WD_ARCHIVE_H */

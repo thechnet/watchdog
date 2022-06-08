@@ -1,6 +1,6 @@
 /*
 bounds.c - watchdog
-Modified 2021-12-12
+Modified 2022-06-08
 */
 
 /* Header-specific includes. */
@@ -21,7 +21,7 @@ Modified 2021-12-12
 /*
 Check bounds on an array.
 */
-int wd_bounds_check(WD_STD_PARAMS, char *array, size_t array_size, size_t item_size, ptrdiff_t index)
+ptrdiff_t wd_bounds_check(WD_STD_PARAMS, char *array, size_t array_size, size_t item_size, ptrdiff_t index)
 {
   /* Assert that this function runs in the right circumstances. */
   WD_FAIL_IF_PTR_NULL(array);
@@ -57,5 +57,5 @@ int wd_bounds_check(WD_STD_PARAMS, char *array, size_t array_size, size_t item_s
     fail_at(__FILE__, __LINE__, WD_MSG_OUT_OF_BOUNDS, index, items_count);
   }
   
-  return 1; /* See watchdog.h. */
+  return index; /* See watchdog.h. */
 }

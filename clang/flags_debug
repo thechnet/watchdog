@@ -1,0 +1,8 @@
+-o build/test.exe
+
+-g
+
+-DWATCHDOG
+
+-Wall
+-Wno-deprecated-declarations

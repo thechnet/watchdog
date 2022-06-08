@@ -1,6 +1,6 @@
 /*
 archive.c - watchdog
-Modified 2021-12-12
+Modified 2022-06-08
 */
 
 /* Header-specific includes. */
@@ -25,15 +25,15 @@ Find the next free spot in the archive, or grow it.
 */
 static wd_archived *wd_archive_find_or_create_slot(void)
 {
-  wd_archived *pointer = NULL;
+  wd_archived *slot = NULL;
   for (size_t i=0; i<wd_archive_size; i++)
     if (wd_archive[i].addr_user == NULL) {
-      pointer = wd_archive+i;
+      slot = wd_archive+i;
       break;
     }
   
   /* Grow the archive if no free spots are left. */
-  if (pointer == NULL) {
+  if (slot == NULL) {
     size_t size_old = wd_archive_size;
     
     wd_archive_size *= 2;
@@ -44,10 +44,10 @@ static wd_archived *wd_archive_find_or_create_slot(void)
     for (size_t i=size_old; i<wd_archive_size; i++)
       wd_archive_erase(wd_archive+i);
     
-    pointer = wd_archive+size_old;
+    slot = wd_archive+size_old;
   }
   
-  return pointer;
+  return slot;
 }
 
 /*
@@ -59,8 +59,10 @@ Initialize the archive.
 */
 void wd_archive_initialize(void)
 {
+  /* Assert that this function runs in the right circumstances. */
   assert(wd_archive == NULL);
   assert(wd_archive_size == 0);
+  
   wd_archive_size = WD_ARCHIVE_SIZE;
   wd_archive = malloc(sizeof(*wd_archive)*wd_archive_size);
   WD_FAIL_IF_OUT_OF_MEMORY_INTERNAL(wd_archive, 0, sizeof(*wd_archive)*wd_archive_size);
@@ -92,8 +94,8 @@ void wd_archive_record(WD_STD_PARAMS, char *addr_user)
   /* Assert that this function runs in the right circumstances. */
   assert(wd_archive != NULL);
   
-  wd_archived *pointer = wd_archive_find_or_create_slot();
-  *pointer = (wd_archived){
+  wd_archived *slot = wd_archive_find_or_create_slot();
+  *slot = (wd_archived){
     .addr_user = addr_user,
     .freed_at = (wd_point){
       .file = file,
@@ -105,12 +107,12 @@ void wd_archive_record(WD_STD_PARAMS, char *addr_user)
 /*
 Erase an address from the archive.
 */
-void wd_archive_erase(wd_archived *pointer)
+void wd_archive_erase(wd_archived *slot)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_archive != NULL);
   
-  *pointer = (wd_archived){
+  *slot = (wd_archived){
     .addr_user = NULL,
     .freed_at = (wd_point){
       .file = NULL,

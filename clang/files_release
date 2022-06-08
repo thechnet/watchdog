@@ -1,5 +1,3 @@
--g
-
 src/dogshed.c
 src/radar.c
 src/reporter.c
@@ -12,12 +10,3 @@ src/overrides.c
 src/public.c
 src/bounds.c
 src/signals.c
-
-test.c
-
--o build/test.exe
-
--DWATCHDOG
-
--Wall
--Wno-deprecated-declarations

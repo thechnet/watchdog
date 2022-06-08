@@ -1,2 +1,2 @@
 language = "c"
-run = "clear && clang @wd && build/test.exe"
+run = "clear && clang @dbg && build/test.exe"

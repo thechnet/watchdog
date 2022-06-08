@@ -1,6 +1,6 @@
 /*
 bounds.h - watchdog
-Modified 2021-12-09
+Modified 2022-06-08
 */
 
 #ifndef WD_BOUNDS_H
@@ -14,6 +14,6 @@ Modified 2021-12-09
 *** Bounds interface.
 */
 
-int wd_bounds_check(char *file, long line, char *array, size_t array_size, size_t item_size, ptrdiff_t index);
+ptrdiff_t wd_bounds_check(char *file, long line, char *array, size_t array_size, size_t item_size, ptrdiff_t index);
 
 #endif /* !WD_BOUNDS_H */

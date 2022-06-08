@@ -1,6 +1,6 @@
 /*
 watchdog.h - watchdog
-Modified 2021-12-02
+Modified 2022-06-08
 */
 
 #ifndef WATCHDOG_H
@@ -44,7 +44,7 @@ Keywords.
 Bounds checking.
 */
 
-#define WD_ARRAY(array, index) array[wd_bounds_check(WD_STD_ARGS, (void*)array, sizeof(array), sizeof(array[0]), index)*index]
+#define WD_ARRAY(array, index) array[wd_bounds_check(WD_STD_ARGS, (void*)array, sizeof(array), sizeof(array[0]), index)]
 
 #else /* !WATCHDOG */
 

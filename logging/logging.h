@@ -36,6 +36,7 @@ Modified 2022-06-08
 #define __LOGGING_STYLE_OUT FGWHITE INVERT
 #define LOGGING_WHERE __LOGGING_PRIHS ":%d"
 #define __LOGGING_WHERE LOGGING_WHERE ": "
+#define __LOGGING_TERMINATOR "\33[0m\n"
 
 /* Miscellaneous */
 #define __LOGGING_STREAM stderr
@@ -48,7 +49,7 @@ Modified 2022-06-08
 #endif
 
 /* Helper macros. */
-#define __LOGGING_msg(style, msg) style __LOGGING_ID __LOGGING_WHERE msg "\33[0m\n"
+#define __LOGGING_msg(style, msg) style __LOGGING_ID __LOGGING_WHERE msg __LOGGING_TERMINATOR
 #define __LOGGING_out(msg, ...) __LOGGING_OUTFN(__LOGGING_STREAM, __LOGGING_WIDE msg, ##__VA_ARGS__)
 
 #define __LOGGING_logger(file, line, style, msg, ...)\

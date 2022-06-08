@@ -21,7 +21,7 @@ Modified 2022-06-08
                                          here to avoid defining the escape sequences as
                                          wide-character strings. */
 #define LOGGING_WIDE
-#define LOGGING_ID "watchdog"
+#define LOGGING_ID "WD"
 #include "../logging/logging.h"
 
 /*

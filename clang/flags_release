@@ -1,0 +1,10 @@
+-o build/watchdog.dll
+
+-O3
+
+-DWATCHDOG
+
+-Wall
+-Wno-deprecated-declarations
+
+-shared
