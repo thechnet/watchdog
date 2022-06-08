@@ -1,6 +1,6 @@
 /*
 radar.c - watchdog
-Modified 2021-12-12
+Modified 2022-06-08
 */
 
 /* Header-specific includes. */
@@ -120,7 +120,7 @@ void wd_radar_terminate(void)
 /*
 Start tracking an address on the radar.
 */
-wd_alloc *wd_radar_add(WD_STD_PARAMS, char *addr_real, size_t size_user, bool protect, bool is_native, bool dependent, bool randomize_memory)
+wd_alloc *wd_radar_add(WD_STD_PARAMS, char *addr_real, size_t size_user, bool do_protect, bool is_native, bool dependent, bool randomize_memory)
 {
   /* Assert that this function runs in the right circumstances. */
   assert(wd_unleashed);
@@ -132,7 +132,7 @@ wd_alloc *wd_radar_add(WD_STD_PARAMS, char *addr_real, size_t size_user, bool pr
   
   /* Convert real address to user address. */
   char *addr_user;
-  if (protect)
+  if (do_protect)
     addr_user = WD_ADDR_REAL_MAKE_USER(addr_real);
   else
     addr_user = addr_real;
@@ -143,10 +143,10 @@ wd_alloc *wd_radar_add(WD_STD_PARAMS, char *addr_real, size_t size_user, bool pr
     .size_user = size_user,
     .addr_user = addr_user,
     .dependent = dependent,
-    .is_protected = protect,
+    .is_protected = do_protect,
     .snapshot = NULL,
-    .padding_check_left = protect,
-    .padding_check_right = protect,
+    .padding_check_left = do_protect,
+    .padding_check_right = do_protect,
     .is_native = is_native,
     .original = NULL
   };

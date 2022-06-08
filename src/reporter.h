@@ -1,6 +1,6 @@
 /*
 reporter.h - watchdog
-Modified 2021-12-12
+Modified 2022-06-08
 */
 
 #ifndef WD_REPORTER_H
@@ -30,7 +30,7 @@ extern size_t wd_reporter_log_count;
 */
 
 #define wd_report(__msg, ...)\
-  {\
+  do {\
     if (wd_reporter_log != NULL) {\
       if (wd_reporter_log_count++ == WD_REPORTER_SIZE_LOG) {\
         fprintf(wd_reporter_log, "(Maximum log count reached.)\n");\
@@ -39,7 +39,7 @@ extern size_t wd_reporter_log_count;
         fprintf(wd_reporter_log, __msg "\n", ##__VA_ARGS__);\
       }\
     }\
-  }
+  } while(0)
 
 /*
 *** Reporter interface.

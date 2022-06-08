@@ -1,6 +1,6 @@
 /*
 logging.h - Une
-Modified 2021-07-17
+Modified 2022-06-08
 */
 
 #ifndef LOGGING_H
@@ -74,10 +74,10 @@ Modified 2021-07-17
 
 /* Fatal information. */
 #define fail_at(file, line, msg, ...)\
-  {\
+  do {\
     __LOGGING_logger(file, line, __LOGGING_STYLE_FAIL, msg, ##__VA_ARGS__);\
     abort();\
-  }
+  } while(0)
 #define fail(msg, ...)\
   fail_at(__FILE__, __LINE__, msg, ##__VA_ARGS__)
 

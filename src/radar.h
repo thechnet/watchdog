@@ -1,6 +1,6 @@
 /*
 radar.h - watchdog
-Modified 2021-12-12
+Modified 2021-12-22
 */
 
 #ifndef WD_RADAR_H
@@ -57,7 +57,7 @@ wd_alloc *wd_radar_add(
   WD_STD_PARAMS,
   char *addr_real,
   size_t size_user,
-  bool protect,
+  bool do_protect,
   bool is_native,
   bool dependent,
   bool randomize_memory
@@ -68,18 +68,10 @@ void wd_radar_update(
   size_t resize_user,
   char *migrated_real
 );
-void wd_radar_remove(
-  WD_STD_PARAMS,
-  wd_alloc *alloc
-);
+void wd_radar_remove(WD_STD_PARAMS, wd_alloc *alloc);
 
-wd_alloc *wd_radar_search(
-  char *addr_user
-);
-int wd_radar_orientate(
-  char *address,
-  wd_alloc **alloc
-);
+wd_alloc *wd_radar_search(char *addr_user);
+int wd_radar_orientate(char *address, wd_alloc **alloc);
 
 // FIXME: Is there a more elegant solution?
 size_t wd_radar_size_real_get(wd_alloc *alloc);

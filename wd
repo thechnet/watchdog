@@ -1,3 +1,5 @@
+-g
+
 src/dogshed.c
 src/radar.c
 src/reporter.c
@@ -17,6 +19,5 @@ test.c
 
 -DWATCHDOG
 
+-Wall
 -Wno-deprecated-declarations
-
--g
