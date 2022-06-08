@@ -1,6 +1,6 @@
 /*
 reporter.c - watchdog
-Modified 2021-12-12
+Modified 2022-06-08
 */
 
 /* Header-specific includes. */
@@ -81,4 +81,13 @@ void wd_reporter_summary(void)
     wd_usage_total_written,
     wd_usage_total_allocated
   );
+}
+
+/*
+Print the location of the last pulse to the reporter log.
+*/
+void wd_reporter_pulse(void)
+{
+  fprintf(wd_reporter_log, WD_MSG_REPORTER_PULSE "\n", wd_pulse.file, wd_pulse.line);
+  fflush(wd_reporter_log);
 }

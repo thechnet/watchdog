@@ -48,5 +48,6 @@ extern size_t wd_reporter_log_count;
 void wd_reporter_initialize(void);
 void wd_reporter_terminate(void);
 void wd_reporter_summary(void);
+void wd_reporter_pulse(void);
 
 #endif /* !WD_REPORTER_H */

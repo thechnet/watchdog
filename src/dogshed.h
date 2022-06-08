@@ -1,6 +1,6 @@
 /*
 dogshed.h - watchdog
-Modified 2021-12-10
+Modified 2022-06-08
 */
 
 #ifndef WD_DOGSHED_H
@@ -54,6 +54,7 @@ Modified 2021-12-10
 #define WD_MSG_SNAPSHOT "Snapshot of [" LOGGING_WHERE "] changed without notice."
 #define WD_MSG_ASSERT "Assertion failed: %s"
 #define WD_MSG_REPORTER_LOG "(Unable to create log file. Not reporting.)"
+#define WD_MSG_REPORTER_PULSE "Pulse at " LOGGING_WHERE "."
 
 /*
 *** Types.

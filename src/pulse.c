@@ -1,10 +1,13 @@
 /*
 pulse.c - watchdog
-Modified 2021-12-10
+Modified 2022-06-08
 */
 
 /* Header-specific includes. */
 #include "pulse.h"
+
+/* Implementation-specific includes. */
+#include "reporter.h"
 
 /*
 Pulse globals.
@@ -36,4 +39,5 @@ void wd_pulse_update(WD_STD_PARAMS)
     .file = file,
     .line = line
   };
+  wd_reporter_pulse();
 }
